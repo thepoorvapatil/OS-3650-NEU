@@ -41,11 +41,11 @@ read_int_done:
   ret
 
 read_int_error:
-//puts("bad input");
+  //puts("bad input");
   mov $bad_input, %rdi
   call puts
 
-//exit(1)
+  //exit(1)
   mov $60, %rax
   mov $1, %rdi
   syscall
@@ -62,10 +62,10 @@ swap(long* xs, long ii, long jj)
 }
 */
 /*
-Variable mappings
-xs: %rdi
-ii: %rsi
-jj: %rdx
+  Variable mapping
+  xs: %rdi
+  ii: %rsi
+  jj: %rdx
 */
 swap:
   enter $0, $0
@@ -101,38 +101,38 @@ partition(long* xs, long lo, long hi)
 }
 */
 /*
-Variable Mappings
-xs: %r12
-lo: %rsi
-hi: %r13
-ii: %r14
-jj: %r15
-pivot: %rbx
+  Variable Mapping
+  xs: %r12 -r15
+  lo: %rsi 
+  hi: %r13 -r12
+  ii: %r14 -r13
+  jj: %r15 -r14
+  pivot: %rbx
 */
 partition:
+  push %r15
   push %r12
   push %r13
   push %r14
-  push %r15
   push %rbx
   enter $8, $0
 
-  mov %rdi, %r12
-  mov %rdx, %r13
+  mov %rdi, %r15
+  mov %rdx, %r12
   //(hi - 1)
-  dec %r13
+  dec %r12
   //long pivot = xs[hi - 1];
-  mov (%r12, %r13, 8),%rbx
+  mov (%r15, %r12, 8),%rbx
   //long ii = lo;
   //long jj = lo;
+  mov %rsi, %r13
   mov %rsi, %r14
-  mov %rsi, %r15
   jmp partition_for
 
 partition_for:
 //for (; jj < (hi - 1); ++jj)
 
-  cmp %r15, %r13
+  cmp %r14, %r12
   jle partition_done
 
 /*
