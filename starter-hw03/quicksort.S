@@ -162,6 +162,7 @@ partition_done:
   mov %r14, %rsi
   mov %r13, %rdx
   call swap
+
   //return ii;
   mov %r14, %rax
   leave
@@ -187,9 +188,9 @@ quicksort(long* xs, long lo, long hi)
 /*
   Variable Mapping
   xs: %r12
+  pp: %r15
   lo: %r13
   hi: %r14
-  pp: %r15
 */
 quicksort:
   push %r12
@@ -218,11 +219,13 @@ quicksort:
   call partition
   mov %rax, %r15
 
+  //recursive calls
   //quicksort(xs, lo, pp);
   mov %r12, %rdi
   mov %r13, %rsi
   mov %r15, %rdx
   call quicksort
+
   //quicksort(xs, pp + 1, hi);
   inc %r15
   mov %r12, %rdi
@@ -237,8 +240,6 @@ quicksort_done:
   pop %r13
   pop %r12
   ret
-
-
 
 
 /*
@@ -264,14 +265,14 @@ main(int _argc, char* _argv[])
 /*
   Variable Mapping
   argc: %rdi
-  nn: 8(%rsp)
   *xs: %r12
+  nn: 8(%rsp)
   ii: %r15 
 */
 main:
   push %r12
   push %r15
-  //Initialise space on the stack;  long nn;
+  //long nn -> initialisation;
   enter $16, $0
 
   #read_int(&nn);
@@ -309,13 +310,13 @@ for (long ii = 0; ii < nn; ++ii) {
 
 for_loop_input_done:
 
-//quicksort(xs, 0, nn);
-mov %r12, %rdi
-mov $0, %rsi
-mov 8(%rsp), %rdx
-call quicksort
+  //quicksort(xs, 0, nn);
+  mov %r12, %rdi
+  mov $0, %rsi
+  mov 8(%rsp), %rdx
+  call quicksort
 
-#printf("%ld\n", nn);
+  #printf("%ld\n", nn);
   mov $int_fmt_nl, %rdi
   mov 8(%rsp), %rsi
   mov $0, %al
@@ -330,19 +331,19 @@ for (long ii = 0; ii < nn; ++ii) {
         printf("%ld ", xs[ii]);
     }
 */
-cmp  8(%rsp), %r15
-jge for_loop_print_done
+  cmp  8(%rsp), %r15
+  jge for_loop_print_done
 
-mov $int_fmt_space, %rdi
-mov (%r12, %r15, 8), %rsi
-mov $0, %al
-call printf
+  mov $int_fmt_space, %rdi
+  mov (%r12, %r15, 8), %rsi
+  mov $0, %al
+  call printf
 
-inc %r15
-jmp for_loop_print
+  inc %r15
+  jmp for_loop_print
 
 for_loop_print_done:
-jmp main_done
+  jmp main_done
 
 main_done:
 
