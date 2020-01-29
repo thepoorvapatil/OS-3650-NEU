@@ -102,37 +102,37 @@ partition(long* xs, long lo, long hi)
 */
 /*
   Variable Mapping
-  xs: %r12 -r15
-  lo: %rsi 
-  hi: %r13 -r12
-  ii: %r14 -r13
-  jj: %r15 -r14
+  xs: %r12
+  hi: %r13
+  ii: %r14
+  lo: %rsi
   pivot: %rbx
+  jj: %r15
 */
 partition:
-  push %r15
   push %r12
   push %r13
   push %r14
+  push %r15
   push %rbx
   enter $8, $0
 
-  mov %rdi, %r15
-  mov %rdx, %r12
+  mov %rdi, %r12
+  mov %rdx, %r13
   //(hi - 1)
-  dec %r12
+  dec %r13
   //long pivot = xs[hi - 1];
-  mov (%r15, %r12, 8),%rbx
+  mov (%r12, %r13, 8),%rbx
   //long ii = lo;
-  //long jj = lo;
-  mov %rsi, %r13
   mov %rsi, %r14
-  jmp partition_for
+  //long jj = lo;
+  mov %rsi, %r15
+  jmp partition_for_loop
 
-partition_for:
-//for (; jj < (hi - 1); ++jj)
+partition_for_loop:
 
-  cmp %r14, %r12
+  //for (; jj < (hi - 1); ++jj)
+  cmp %r15, %r13
   jle partition_done
 
 /*
@@ -154,7 +154,7 @@ jmp partition_inc
 
 partition_inc:
   inc %r15
-  jmp partition_for
+  jmp partition_for_loop
 
 partition_done:
   //swap(xs, ii, hi - 1);
