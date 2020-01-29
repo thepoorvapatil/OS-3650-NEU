@@ -186,11 +186,12 @@ quicksort(long* xs, long lo, long hi)
     quicksort(xs, pp + 1, hi);
 }
 */
-/*Variable Mappings
-xs: %r12
-lo: %r13
-hi: %r14
-pp: %r15
+/*
+  Variable Mapping
+  xs: %r12
+  lo: %r13
+  hi: %r14
+  pp: %r15
 */
 quicksort:
   push %r12
@@ -263,11 +264,11 @@ main(int _argc, char* _argv[])
 }
 */
 /*
-Variable Mappings
-argc: %rdi
-nn: 8(%rsp)
-*xs: %r12
-ii: %r15 
+  Variable Mapping
+  argc: %rdi
+  nn: 8(%rsp)
+  *xs: %r12
+  ii: %r15 
 */
 main:
   push %r12
@@ -351,11 +352,13 @@ main_done:
   mov $new_line, %rdi
   mov $0, %al
   call printf
-
+  
+  /*
   //printf("\n");
   mov $new_line, %rdi
   mov $0, %al
   call printf
+  */
 
   //free(xs);
   mov %r12, %rdi
