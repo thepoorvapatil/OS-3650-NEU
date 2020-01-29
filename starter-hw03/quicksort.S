@@ -19,13 +19,11 @@ read_int(long* ptr)
 */
 /*
   Variable mapping
-  ptr: %r12
+  ptr: %r15
 */
 read_int:
-  push %r12
+  push %r15
   enter $8, $0
-
-#mov %rdi, %r12
 
 //scanf("%ld", ptr)
   mov %rdi, %rsi
@@ -33,13 +31,13 @@ read_int:
   mov $0, %al
   call scanf
 
-#mov $1, %rax Testing segmentation fault boundaries
+// check for wrong input
   cmp $1, %rax
   jne read_int_error
 
 read_int_done:
   leave
-  pop %r12
+  pop %r15
   ret
 
 read_int_error:
@@ -352,18 +350,10 @@ main_done:
   mov $new_line, %rdi
   mov $0, %al
   call printf
-  
-  /*
-  //printf("\n");
-  mov $new_line, %rdi
-  mov $0, %al
-  call printf
-  */
 
   //free(xs);
   mov %r12, %rdi
   call free
-  //return 0;
 
   leave
   pop %r13
