@@ -15,7 +15,7 @@ make_svec()
     sv->data = malloc(2 * sizeof(char*));
     sv->size = 0;
     // TODO: correctly allocate and initialize data structure
-    sv->capacity=0;
+    sv->capacity=4;
     return sv;
 }
 
@@ -52,9 +52,8 @@ svec_push_back(svec* sv, char* item)
 
     // if size== capacity, then double the size
     if (ii == sv->capacity) {
-		sv->capacity*=2;
+		sv->capacity *= 2;
 		sv->data = realloc(sv->data, 2 * sizeof(char*));
-        
 	}
 
     sv->size = ii + 1;

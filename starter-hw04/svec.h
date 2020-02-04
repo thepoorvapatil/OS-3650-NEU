@@ -8,7 +8,7 @@ typedef struct svec {
     int size;
     char** data;
     // TODO: complete struct
-    //what more???
+    //max capacity of the dynamic array, doubled if limit reached.
     int capacity;
 } svec;
 
