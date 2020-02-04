@@ -24,7 +24,7 @@ sort(svec* xs)
             pos+=1;
         }
         else{
-            svec_swap(&xs, pos, pos-1);
+            svec_swap(xs, pos, pos-1);
             pos-=1;
         }
     } 
