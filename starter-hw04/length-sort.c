@@ -18,9 +18,9 @@ sort(svec* xs)
     //         swap a[pos] and a[pos-1]
     //         pos := pos - 1
 
-    int pos=1;
+    int pos=0;
     while(pos < xs->size){
-        if (strlen(xs->data[pos]) >= strlen(xs->data[pos-1])){
+        if (pos==0 || strlen(xs->data[pos]) >= strlen(xs->data[pos-1])){
             pos+=1;
         }
         else{
@@ -28,12 +28,6 @@ sort(svec* xs)
             pos-=1;
         }
     } 
-
-    pos=0;
-    while (pos < xs->size){
-        printf("%s", xs->data[pos]);
-        pos+=1;
-    }
 
 }
 

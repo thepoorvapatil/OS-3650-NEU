@@ -77,13 +77,3 @@ svec_swap(svec* sv, int ii, int jj)
     sv->data[jj]=temp;
 
 }
-
-// int main(){
-//     svec* v ;
-//     v = make_svec();
-//     char e="e";
-//     char f="f";
-// 	svec_put(&v,0,&e);
-//     printf("%c", svec_gett(&v,0));
-//     return 0;
-// }
