@@ -50,6 +50,11 @@ svec_push_back(svec* sv, char* item)
 
     // TODO: expand vector if backing erray
     // is not big enough
+    if (ii == sv->capacity) {
+		sv->size *= 2;
+		sv->data = realloc(sv->data, 2 * sizeof(char*));
+	}
+
 
     sv->size = ii + 1;
     svec_put(sv, ii, item);
