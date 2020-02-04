@@ -8,6 +8,8 @@ typedef struct svec {
     int size;
     char** data;
     // TODO: complete struct
+    //what more???
+    int capacity;
 } svec;
 
 svec* make_svec();

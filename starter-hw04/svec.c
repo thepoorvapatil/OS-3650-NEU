@@ -15,6 +15,7 @@ make_svec()
     sv->data = malloc(2 * sizeof(char*));
     sv->size = 0;
     // TODO: correctly allocate and initialize data structure
+    sv->capacity=0;
     return sv;
 }
 
@@ -22,6 +23,7 @@ void
 free_svec(svec* sv)
 {
     // TODO: free all allocated data
+    free(sv->data);
 }
 
 char*
@@ -38,6 +40,7 @@ svec_put(svec* sv, int ii, char* item)
     sv->data[0] = item;
     // TODO: insert item into slot ii
     // Consider ownership of string in collection.
+
 }
 
 void
