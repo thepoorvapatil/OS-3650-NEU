@@ -37,12 +37,11 @@ void
 svec_put(svec* sv, int ii, char* item)
 {
     assert(ii >= 0 && ii < sv->size);
-    sv->data[0] = item;
+    sv->data[ii] = item; // ??? what's this for?
     // TODO: insert item into slot ii
     // Consider ownership of string in collection.
-    // sv->data[ii] = item;
-	sv->capacity++;
-
+    sv->size++;
+    
 }
 
 void
@@ -67,14 +66,18 @@ void
 svec_swap(svec* sv, int ii, int jj)
 {
     // TODO: Swap the items in slots ii and jj
+    char temp = sv->data[ii];
+    sv->data[ii]=sv->data[jj];
+    sv->data[jj]=temp;
+
 }
 
-int main(){
-    svec* v ;
-    v = make_svec();
-    char e="e";
-    char f="f";
-	svec_put(&v,0,&e);
-    printf("%c", svec_gett(&v,0));
-    return 0;
-}
+// int main(){
+//     svec* v ;
+//     v = make_svec();
+//     char e="e";
+//     char f="f";
+// 	svec_put(&v,0,&e);
+//     printf("%c", svec_gett(&v,0));
+//     return 0;
+// }
