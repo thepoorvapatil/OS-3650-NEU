@@ -53,7 +53,7 @@ svec_push_back(svec* sv, char* item)
     // if size== capacity, then double the size
     if (ii == sv->capacity) {
 		sv->capacity *= 2;
-		sv->data = realloc(sv->data, 2 * sizeof(item));
+		sv->data = realloc(sv->data, 2 * sizeof(char*));
 	}
 
     sv->size = ii + 1;
@@ -64,7 +64,8 @@ void
 svec_swap(svec* sv, int ii, int jj)
 {
     // TODO: Swap the items in slots ii and jj
-    char temp = sv->data[ii];
+    char* temp = sv->data[ii];
+
     sv->data[ii]=sv->data[jj];
     sv->data[jj]=temp;
 
