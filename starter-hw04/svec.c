@@ -40,7 +40,7 @@ svec_put(svec* sv, int ii, char* item)
     sv->data[0] = item;
     // TODO: insert item into slot ii
     // Consider ownership of string in collection.
-    sv->data[ii] = item;
+    // sv->data[ii] = item;
 	sv->capacity++;
 
 }
@@ -52,6 +52,7 @@ svec_push_back(svec* sv, char* item)
 
     // TODO: expand vector if backing erray
     // is not big enough
+
     // if size== capacity, then double the size
     if (ii == sv->capacity) {
 		sv->size *= 2;
@@ -66,4 +67,13 @@ void
 svec_swap(svec* sv, int ii, int jj)
 {
     // TODO: Swap the items in slots ii and jj
+}
+
+int main(){
+    svec* v = make_svec();
+    char e="e";
+    char f="f";
+	svec_put(&v,0,&e);
+    printf("%c", svec_gett(&v,0));
+    return 0;
 }
