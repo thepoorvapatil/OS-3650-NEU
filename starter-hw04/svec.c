@@ -41,7 +41,7 @@ svec_put(svec* sv, int ii, char* item)
     // TODO: insert item into slot ii
     // Consider ownership of string in collection.
     sv->data[ii] = item;
-	sv->count++;
+	sv->capacity++;
 
 }
 
