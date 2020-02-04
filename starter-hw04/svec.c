@@ -37,11 +37,9 @@ void
 svec_put(svec* sv, int ii, char* item)
 {
     assert(ii >= 0 && ii < sv->size);
-    sv->data[ii] = item; // ??? what's this for?
+    sv->data[ii] = item; 
     // TODO: insert item into slot ii
     // Consider ownership of string in collection.
-    sv->size++;
-    
 }
 
 void
@@ -54,7 +52,7 @@ svec_push_back(svec* sv, char* item)
 
     // if size== capacity, then double the size
     if (ii == sv->capacity) {
-		sv->size *= 2;
+		ii *= 2;
 		sv->data = realloc(sv->data, 2 * sizeof(char*));
 	}
 
