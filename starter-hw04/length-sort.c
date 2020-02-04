@@ -20,7 +20,7 @@ sort(svec* xs)
 
     int pos=0;
     while(pos < xs->size){
-        if (xs->data[pos] == 0 || strlen(xs->data[pos]) >= strlen(xs->data[pos-1])){
+        if (strlen(xs->data[pos]) == 0 || strlen(xs->data[pos]) >= strlen(xs->data[pos-1])){
             pos+=1;
         }
         else{
