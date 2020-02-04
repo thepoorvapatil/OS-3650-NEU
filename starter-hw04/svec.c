@@ -53,7 +53,7 @@ svec_push_back(svec* sv, char* item)
     // if size== capacity, then double the size
     if (ii == sv->capacity) {
 		sv->capacity *= 2;
-		sv->data = (char*)realloc(sv->data, sv->capacity * sizeof(char*));
+		sv->data = (char**)realloc(sv->data, sv->capacity * sizeof(char*));
 	}
 
     sv->size = ii + 1;
