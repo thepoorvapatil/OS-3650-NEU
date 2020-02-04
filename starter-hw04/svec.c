@@ -70,7 +70,8 @@ svec_swap(svec* sv, int ii, int jj)
 }
 
 int main(){
-    svec* v = make_svec();
+    svec* v ;
+    v = make_svec();
     char e="e";
     char f="f";
 	svec_put(&v,0,&e);
