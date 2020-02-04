@@ -29,6 +29,10 @@ sort(svec* xs)
         }
     } 
 
+    pos=0;
+    while (pos < xs->size){
+        printf("%s", xs->data[pos]);
+    }
 
 }
 
