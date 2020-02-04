@@ -54,6 +54,7 @@ svec_push_back(svec* sv, char* item)
     if (ii == sv->capacity) {
 		ii *= 2;
 		sv->data = realloc(sv->data, 2 * sizeof(char*));
+        sv->capacity*=2;
 	}
 
     sv->size = ii + 1;
