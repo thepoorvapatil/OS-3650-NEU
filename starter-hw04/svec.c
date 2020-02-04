@@ -40,6 +40,8 @@ svec_put(svec* sv, int ii, char* item)
     sv->data[0] = item;
     // TODO: insert item into slot ii
     // Consider ownership of string in collection.
+    sv->data[ii] = item;
+	sv->count++;
 
 }
 
@@ -50,11 +52,11 @@ svec_push_back(svec* sv, char* item)
 
     // TODO: expand vector if backing erray
     // is not big enough
+    // if size== capacity, then double the size
     if (ii == sv->capacity) {
 		sv->size *= 2;
 		sv->data = realloc(sv->data, 2 * sizeof(char*));
 	}
-
 
     sv->size = ii + 1;
     svec_put(sv, ii, item);
