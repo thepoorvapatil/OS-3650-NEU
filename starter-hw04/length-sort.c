@@ -37,7 +37,7 @@ chomp(char* text)
     // TODO: Modify input string to remove trailing newline ('\n')
     int l=strlen(text);
     if( text[l-1] == '\n' )
-        text[l-1] = 0;
+        text[l-1] = '\0';
 }
 
 int
