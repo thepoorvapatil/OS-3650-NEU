@@ -12,9 +12,10 @@ svec*
 make_svec()
 {
     svec* sv = malloc(sizeof(svec));
-    sv->data = malloc(2 * sizeof(char*));
     sv->size = 0;
     // TODO: correctly allocate and initialize data structure
+    sv->data = malloc(2 * sizeof(char*));
+    memset(sv->data, 0, 4 * sizeof(char*));
     sv->capacity=4;
     return sv;
 }
@@ -23,7 +24,13 @@ void
 free_svec(svec* sv)
 {
     // TODO: free all allocated data
+    for (int ii = 0; ii < sv->size; ii++) {
+        if (sv->data[ii] != 0) {
+            free(sv->data[ii]);
+        }
+    }
     free(sv->data);
+    free(sv);
 }
 
 char*
@@ -37,7 +44,7 @@ void
 svec_put(svec* sv, int ii, char* item)
 {
     assert(ii >= 0 && ii < sv->size);
-    sv->data[ii] = item; 
+    sv->data[ii] = strdup(item); 
     // TODO: insert item into slot ii
     // Consider ownership of string in collection.
 }
@@ -53,7 +60,7 @@ svec_push_back(svec* sv, char* item)
     // if size== capacity, then double the size
     if (ii == sv->capacity) {
 		sv->capacity *= 2;
-		sv = realloc(sv, sv->capacity * sizeof(svec));
+		sv->data = (char**) realloc(sv->data, sv->capacity * sizeof(char*));
 	}
 
     sv->size = ii + 1;
