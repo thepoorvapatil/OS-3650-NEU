@@ -16,7 +16,7 @@ typedef struct hashmap {
     int capacity;
     int size; //???
     int loadfactor;
-
+    hashmap_pair** pair;
 
 } hashmap;
 

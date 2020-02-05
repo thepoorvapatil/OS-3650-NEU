@@ -45,7 +45,11 @@ void
 free_hashmap(hashmap* hh)
 {
     // TODO: Free all allocated data.
-    
+    for (long ii = 0; ii < hh->capacity; ii++) {
+        free_pair(hh->pair[ii]);
+    }
+    free(hh->pair);
+    free(hh);
 }
 
 int
@@ -89,4 +93,6 @@ hashmap_dump(hashmap* hh)
     printf("== hashmap dump ==\n");
     // TODO: Print out all the keys and values currently
     // in the map, in storage order. Useful for debugging.
+    printf("Key\tValue");
+    printf("%s\t%d", hh->pair);
 }
