@@ -11,10 +11,10 @@ typedef struct hashmap_pair {
 } hashmap_pair;
 
 typedef struct hashmap {
-    long useless_field;
+    // long useless_field;
     // TODO: Define working hashmap struct.
     int capacity;
-    int size; //???
+    int size;
     int loadfactor;
     hashmap_pair** pair;
 
