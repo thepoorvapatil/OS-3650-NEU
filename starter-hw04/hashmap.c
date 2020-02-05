@@ -16,7 +16,11 @@ int
 hash(char* key)
 {
     // TODO: Produce an appropriate hash value.
-    return 0;
+    // sum of ASCII values of characters
+    int sum=0;
+    for (int ii=0; ii < strlen(key); ii++)
+        sum += key[ii];
+    return sum % 16 ;
 }
 
 hashmap*
@@ -25,7 +29,10 @@ make_hashmap_presize(int nn)
     hashmap* hh = calloc(1, sizeof(hashmap));
     // TODO: Allocate and initialize a hashmap with capacity 'nn'.
     // Double check "man calloc" to see what that function does.
-    return hh;
+    hh->loadfactor=0.5;
+    hh->capacity=nn;
+
+
 }
 
 hashmap*
@@ -38,6 +45,7 @@ void
 free_hashmap(hashmap* hh)
 {
     // TODO: Free all allocated data.
+    
 }
 
 int

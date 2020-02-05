@@ -10,6 +10,10 @@ void
 chomp(char* text)
 {
     // TODO: remove trailing newline from string
+    int l=strlen(text)-1;
+    if( text[l] == '\n'){
+        text[l] = '\0';
+    }
 }
 
 int
