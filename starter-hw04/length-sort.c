@@ -28,7 +28,6 @@ sort(svec* xs)
             pos-=1;
         }
     } 
-
 }
 
 void
@@ -36,8 +35,9 @@ chomp(char* text)
 {
     // TODO: Modify input string to remove trailing newline ('\n')
     int l=strlen(text)-1;
-    if( text[l] == '\n')
+    if( text[l] == '\n'){
         text[l] = '\0';
+    }
 }
 
 int
