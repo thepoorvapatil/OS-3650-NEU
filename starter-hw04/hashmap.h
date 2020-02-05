@@ -14,8 +14,10 @@ typedef struct hashmap {
     long useless_field;
     // TODO: Define working hashmap struct.
     int capacity;
-    int size;
-    
+    int size; //???
+    int loadfactor;
+
+
 } hashmap;
 
 hashmap* make_hashmap();
