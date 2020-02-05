@@ -12,9 +12,9 @@ svec*
 make_svec()
 {
     svec* sv = malloc(sizeof(svec));
+    sv->data = malloc(2 * sizeof(char*));
     sv->size = 0;
     // TODO: correctly allocate and initialize data structure
-    sv->data = malloc(2 * sizeof(char*));
     sv->capacity=2;
     memset(sv->data, 0, 2 * sizeof(char*));
     return sv;
