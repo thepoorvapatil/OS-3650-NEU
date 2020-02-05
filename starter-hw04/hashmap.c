@@ -27,8 +27,8 @@ hashmap_pair*
 make_hashmap_pair(const char* key, const char* val)
 {
     hashmap_pair* pp = malloc(sizeof(hashmap_pair));
-    pp->key = strdup(key);
-    pp->val = strdup(val);
+    pp->key = key;
+    pp->val = val;
     pp->tomb = false;
     pp->used = true;
     return pp;
@@ -47,7 +47,6 @@ make_hashmap_presize(int nn)
     hh->size = 0;
     // mm->capacity = 4;
     hh->pair = calloc(hh->capacity, sizeof(hashmap_pair*));
-    hh->
     return hh;
 }
 
@@ -84,7 +83,7 @@ hashmap_get(hashmap* hh, char* kk)
     // key kk.
     // Note: return -1 for key not found.
     int hashget = hash(kk)%hh->capacity;
-    for (int ii=0; i< hh->size; ii++){
+    for (int ii=0; ii< hh->size; ii++){
         if (strcmp(hashget, hh->pair[ii]->key) == 0) {
             return hh->pair[ii]->val;
         }
@@ -119,7 +118,7 @@ hashmap_put(hashmap* hh, char* kk, int vv)
 	}
 
     int hashval = hash(kk)%hh->capacity;
-    hh->pair[ii] = make_hashmap_pair(kk, hashval);
+    hh->pair[hashval] = make_hashmap_pair(kk, hashval);
     hh->size += 1;
 }
 
@@ -128,7 +127,7 @@ hashmap_del(hashmap* hh, char* kk)
 {
     // TODO: Remove any value associated with
     // this key in the map.
-    for (int ii=0; i< hh->size; ii++){
+    for (int ii=0; ii< hh->size; ii++){
         if (strcmp(kk, hh->pair[ii]->key) == 0) {
             hh->pair[ii]->tomb=true;
         }
