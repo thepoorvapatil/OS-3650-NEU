@@ -27,7 +27,7 @@ hashmap_pair*
 make_hashmap_pair(const char* key, const char* val)
 {
     hashmap_pair* pp = malloc(sizeof(hashmap_pair));
-    pp->key = key;
+    strlcpy(pp->key,key, 4 * sizeof(char));
     pp->val = val;
     pp->tomb = false;
     pp->used = true;
