@@ -91,7 +91,7 @@ tokenize(char *line)
 
    while (index < len)
    {
-      if (line[index] == " ")
+      if (line[index] == ' ')
       {
          index++;
          continue;
@@ -100,9 +100,9 @@ tokenize(char *line)
       if ((line[index] == '|' && line[index + 1] == '|') || (line[index] == '&' && line[index + 1] == '&'))
       {
         if(line[index] == '|')
-            char str[] = "||";
+            char* str = "||";
         else
-            char str[] = "&&";
+            char* str = "&&";
          svec_push_back(sv, str);
          index += 2;
          continue;
