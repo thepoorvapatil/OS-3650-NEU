@@ -67,7 +67,7 @@ print_in_reverse(svec* sv){
 }
 
 char *
-read_argument(const char *text, int ii)
+make_word(const char *text, int ii)
 {
    int nn = 0;
    while (!isblank(text[ii + nn]) && !(text[ii + nn] == '&' || text[ii + nn] == '|' || text[ii + nn] == '<' || text[ii + nn] == '>' || text[ii + nn] == ';'))
@@ -75,10 +75,10 @@ read_argument(const char *text, int ii)
       nn++;
    }
 
-   char *arg = malloc(nn + 1);
-   memcpy(arg, text + ii, nn);
-   arg[nn] = 0;
-   return arg;
+   char *word = malloc(nn + 1);
+   memcpy(word, text + ii, nn);
+   word[nn] = 0;
+   return word;
 }
 
 svec *
@@ -117,11 +117,11 @@ tokenize(char *text)
          continue;
       }
 
-         char *arg = read_argument(text, ii);
-         chomp(arg);
-         svec_push_back(sv, arg);
-         ii += strlen(arg);
-         free(arg);
+         char *word = make_word(text, ii);
+         chomp(word);
+         svec_push_back(sv, word);
+         ii += strlen(word);
+         free(word);
    }
    return sv;
 }
@@ -193,7 +193,7 @@ tokenize(char *text)
 
 
 int 
-main(int argc, char* const argv[]){
+main(int wordc, char* const wordv[]){
 
     while (1) {
         // svec* tokens = make_svec();
