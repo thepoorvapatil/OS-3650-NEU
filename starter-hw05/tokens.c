@@ -99,20 +99,20 @@ tokenize(char *text)
 
       if ((text[ii] == '|' && text[ii + 1] == '|') || (text[ii] == '&' && text[ii + 1] == '&'))
       {
-         char spec[] = "xx";
-         spec[0] = text[ii];
-         spec[1] = text[ii + 1];
-         svec_push_back(sv, spec);
+         char str[] = "xx";
+         str[0] = text[ii];
+         str[1] = text[ii + 1];
+         svec_push_back(sv, str);
          ii += 2;
          continue;
       }
 
       if (text[ii] == '<' || text[ii] == '>' || text[ii] == ';' || text[ii] == '|' || text[ii] == '&')
       {
-         char spec[2];
-         spec[0] = text[ii];
-         spec[1] = 0;
-         svec_push_back(sv, spec);
+         char str[2];
+         str[0] = text[ii];
+         str[1] = 0;
+         svec_push_back(sv, str);
          ++ii;
          continue;
       }
@@ -142,7 +142,7 @@ tokenize(char *text)
 //             memset(token,0,strlen(token));
 //         }
 
-//         //check for special character
+//         //check for strial character
 //         else if(ch == '&' || ch == '|' || ch == '<' || ch == '>' || ch == ';'){ 
             
 //             trim(token);
@@ -151,7 +151,7 @@ tokenize(char *text)
 //                 svec_push_back(sv, token);
 //             memset(token,0,strlen(token));
 
-//             //check for repeated special character
+//             //check for repeated strial character
 //             if(i<strlen(line)-1 && ch == line[i+1]){ 
 
 //                 strncat(token, &ch, 1);
@@ -165,7 +165,7 @@ tokenize(char *text)
 //                 }
 //                 memset(token,0,strlen(token));
 //             }
-//             //if its not repeated special character
+//             //if its not repeated strial character
 //             else{ 
 //                 strncat(token, &ch, 1);
 //                 trim(token);
@@ -176,7 +176,7 @@ tokenize(char *text)
 //                 memset(token,0,strlen(token));
 //             }
 //         }
-//         //non special non space character
+//         //non strial non space character
 //         else{ 
 //             strncat(token, &ch, 1);
 //         }
