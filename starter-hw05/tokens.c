@@ -67,66 +67,123 @@ print_in_reverse(svec* sv){
    }
 }
 
-void 
-tokenize(svec* sv, char* line){
-    char token[256] = "";
-    chomp(line);
-    for(int i = 0; i<strlen(line); i++){
-        char ch = line[i];
+svec*
+tokenize(char *text)
+{
+   svec *sv = make_svec();
+   //Length of the text
+   int len = strlen(text);
+   int ii = 0;
 
-        //space. pushback into sv
-        if(ch ==' '){ 
-            trim(token);
-            if(strlen(token)!=0){
-                svec_push_back(sv, token);
-            }
-            memset(token,0,strlen(token));
-        }
+   while (ii < len)
+   {
+      if (isspace(text[ii]) || text[ii] == 0 || text[ii] == '\n')
+      {
+         // puts("space");
+         ++ii;
+         continue;
+      }
 
-        //check for special character
-        else if(ch == '&' || ch == '|' || ch == '<' || ch == '>' || ch == ';'){ 
-            
-            trim(token);
-            //if not empty
-            if(strlen(token)!=0)
-                svec_push_back(sv, token);
-            memset(token,0,strlen(token));
+      if ((text[ii] == '|' && text[ii + 1] == '|') || (text[ii] == '&' && text[ii + 1] == '&'))
+      {
+         // puts("doubles");
+         char spec[] = "xx";
+         spec[0] = text[ii];
+         spec[1] = text[ii + 1];
+         svec_push_back(sv, spec);
+         ii += 2;
+         continue;
+      }
 
-            //check for repeated special character
-            if(i!=strlen(line)-1 && ch == line[i+1]){ 
+      if (text[ii] == '<' || text[ii] == '>' || text[ii] == ';' || text[ii] == '|' || text[ii] == '&')
+      {
+         // puts("singles");
+         char spec[] = "x";
+         spec[0] = text[ii];
+         svec_push_back(sv, spec);
+         ++ii;
+         continue;
+      }
 
-                strncat(token, &ch, 1);
-                strncat(token, &ch, 1);
-                i++;
-                //trim
-                trim(token);
-                //if not empty
-                if(strlen(token)!=0){
-                    svec_push_back(sv, token);
-                }
-                memset(token,0,strlen(token));
-            }
-            //if its not repeated special character
-            else{ 
-                strncat(token, &ch, 1);
-                trim(token);
-                if(strlen(token)!=0){
-                    svec_push_back(sv, token);
-                }
-                memset(token,0,strlen(token));
-            }
-        }
-        //non special non space character
-        else{ 
-            strncat(token, &ch, 1);
-        }
-    }
-    trim(token);
-    if(strlen(token)!=0){
-        svec_push_back(sv, token);
-    }
-    memset(token,0,strlen(token));
+      if (text[ii] != 0)
+      {
+         char *arg = read_argument(text, ii);
+         chomp(arg);
+         svec_push_back(sv, arg);
+         ii += strlen(arg);
+         // printf("Arg: (%s)\n", arg);
+         free(arg);
+
+         continue;
+      }
+   }
+   return sv;
 }
+
+// void tokenize(svec* sv, char*)
+//     char token[256] = "";
+//     chomp(line);
+//     for(int i = 0; i<strlen(line); i++){
+//         char ch = line[i];
+
+//         //space. pushback into sv
+//         if(ch == " "){ 
+//             trim(token);
+//             //if not empty
+//             if(strlen(token)!=0){
+//                 svec_push_back(sv, token);
+//             }
+//             memset(token,0,strlen(token));
+//         }
+
+//         //check for special character
+//         else if(ch == '&' || ch == '|' || ch == '<' || ch == '>' || ch == ';'){ 
+            
+//             trim(token);
+//             //if not empty
+//             if(strlen(token)!=0)
+//                 svec_push_back(sv, token);
+//             memset(token,0,strlen(token));
+
+//             //check for repeated special character
+//             if(i<strlen(line)-1 && ch == line[i+1]){ 
+
+//                 strncat(token, &ch, 1);
+//                 strncat(token, &ch, 1);
+//                 i++;
+//                 //trim
+//                 trim(token);
+//                 //if not empty
+//                 if(strlen(token)!=0){
+//                     svec_push_back(sv, token);
+//                 }
+//                 memset(token,0,strlen(token));
+//             }
+//             //if its not repeated special character
+//             else{ 
+//                 strncat(token, &ch, 1);
+//                 trim(token);
+//                 //if not empty
+//                 if(strlen(token)!=0){
+//                     svec_push_back(sv, token);
+//                 }
+//                 memset(token,0,strlen(token));
+//             }
+//         }
+//         //non special non space character
+//         else{ 
+//             strncat(token, &ch, 1);
+//         }
+//     }
+//     //trim
+//     trim(token);
+
+//     //if not empty
+//     if(strlen(token)!=0){
+//         svec_push_back(sv, token);
+//     }
+//     memset(token,0,strlen(token));
+// }
 
 
 int 
@@ -142,7 +199,7 @@ main(int argc, char* const argv[]){
             exit(0);
         }
         //tokenize
-        tokenize(tokens, line);
+        tokens = tokenize(line);
         //print in reverse
         print_in_reverse(tokens);
         free_svec(tokens);
