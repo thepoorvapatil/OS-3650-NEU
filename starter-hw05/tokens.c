@@ -68,7 +68,7 @@ print_in_reverse(svec* sv){
 
 //return word before sp char
 char *
-make_word(const char *text, int ii)
+get_word(const char *text, int ii)
 {
    int nn = 0;
    while (!isblank(text[ii + nn]) && !(text[ii + nn] == '&' || text[ii + nn] == '|' || text[ii + nn] == '<' || text[ii + nn] == '>' || text[ii + nn] == ';'))
@@ -92,38 +92,38 @@ tokenize(char *text)
 
    while (index < len)
    {
-      if (isspace(text[index]))
-      {
-         ++index;
-         continue;
-      }
+        if (isspace(text[index]))
+        {
+            ++index;
+            continue;
+        }
 
-      if ((text[index] == '|' && text[index + 1] == '|') || (text[index] == '&' && text[index + 1] == '&'))
-      {
-         char str[3];
-         str[0] = text[index];
-         str[1] = text[index + 1];
-         str[2] = 0;
-         svec_push_back(sv, str);
-         index += 2;
-         continue;
-      }
+        if ((text[index] == '|' && text[index + 1] == '|') || (text[index] == '&' && text[index + 1] == '&'))
+        {
+            char str[3];
+            str[0] = text[index];
+            str[1] = text[index + 1];
+            str[2] = 0;
+            svec_push_back(sv, str);
+            index += 2;
+            continue;
+        }
 
-      if (text[index] == '<' || text[index] == '>' || text[index] == ';' || text[index] == '|' || text[index] == '&')
-      {
-         char str[2];
-         str[0] = text[index];
-         str[1] = 0;
-         svec_push_back(sv, str);
-         ++index;
-         continue;
-      }
+        if (text[index] == '<' || text[index] == '>' || text[index] == ';' || text[index] == '|' || text[index] == '&')
+        {
+            char str[2];
+            str[0] = text[index];
+            str[1] = 0;
+            svec_push_back(sv, str);
+            ++index;
+            continue;
+        }
 
-         char *word = make_word(text, index);
-         chomp(word);
-         svec_push_back(sv, word);
-         index += strlen(word);
-         free(word);
+        char *word = get_word(text, index);
+        chomp(word);
+        svec_push_back(sv, word);
+        index += strlen(word);
+        free(word);
    }
    return sv;
 }
