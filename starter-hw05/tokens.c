@@ -67,51 +67,62 @@ print_in_reverse(svec* sv){
    }
 }
 
+char *
+read_argument(const char *text, int ii)
+{
+   int nn = 0;
+   while (!isblank(text[ii + nn]) && !(text[ii + nn] == '&' || text[ii + nn] == '|' || text[ii + nn] == '<' || text[ii + nn] == '>' || text[ii + nn] == ';'))
+   {
+      nn++;
+   }
+
+   char *arg = malloc(nn + 1);
+   memcpy(arg, text + ii, nn);
+   arg[nn] = 0;
+   return arg;
+}
+
 svec*
-tokenize(char *text)
+tokenize(char *line)
 {
    svec *sv = make_svec();
-   //Length of the text
-   int len = strlen(text);
-   int ii = 0;
+   //Length of the line
+   int index = 0;
+   int len = strlen(line);
 
-   while (ii < len)
+   while (index < len)
    {
-      if (isspace(text[ii]) || text[ii] == 0 || text[ii] == '\n')
+      if (isspace(line[index]) || line[index] == 0 || line[index] == '\n')
       {
-         // puts("space");
-         ++ii;
+         index++;
          continue;
       }
 
-      if ((text[ii] == '|' && text[ii + 1] == '|') || (text[ii] == '&' && text[ii + 1] == '&'))
+      if ((line[index] == '|' && line[index + 1] == '|') || (line[index] == '&' && line[index + 1] == '&'))
       {
-         // puts("doubles");
          char spec[] = "xx";
-         spec[0] = text[ii];
-         spec[1] = text[ii + 1];
+         spec[0] = line[index];
+         spec[1] = line[index + 1];
          svec_push_back(sv, spec);
-         ii += 2;
+         index += 2;
          continue;
       }
 
-      if (text[ii] == '<' || text[ii] == '>' || text[ii] == ';' || text[ii] == '|' || text[ii] == '&')
+      if (line[index] == '<' || line[index] == '>' || line[index] == ';' || line[index] == '|' || line[index] == '&')
       {
-         // puts("singles");
          char spec[] = "x";
-         spec[0] = text[ii];
+         spec[0] = line[index];
          svec_push_back(sv, spec);
-         ++ii;
+         index++;
          continue;
       }
 
-      if (text[ii] != 0)
+      if (line[index] != 0)
       {
-         char *arg = read_argument(text, ii);
+         char *arg = read_argument(line, index);
          chomp(arg);
          svec_push_back(sv, arg);
-         ii += strlen(arg);
-         // printf("Arg: (%s)\n", arg);
+         index += strlen(arg);
          free(arg);
 
          continue;
