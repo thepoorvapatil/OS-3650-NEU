@@ -119,17 +119,12 @@ tokenize(char *text)
          continue;
       }
 
-      if (text[ii] != 0)
-      {
          char *arg = read_argument(text, ii);
          chomp(arg);
          svec_push_back(sv, arg);
          ii += strlen(arg);
          // printf("Arg: (%s)\n", arg);
          free(arg);
-
-         continue;
-      }
    }
    return sv;
 }
