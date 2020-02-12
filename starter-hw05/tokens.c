@@ -99,9 +99,10 @@ tokenize(char *text)
 
       if ((text[ii] == '|' && text[ii + 1] == '|') || (text[ii] == '&' && text[ii + 1] == '&'))
       {
-         char str[] = "xx";
+         char str[3];
          str[0] = text[ii];
          str[1] = text[ii + 1];
+         str[2] = 0;
          svec_push_back(sv, str);
          ii += 2;
          continue;
