@@ -3,7 +3,6 @@
 #include <string.h>
 #include "svec.h"
 #include <assert.h>
-#include <ctype.h>
 #include <stdlib.h>
 
 char*
@@ -92,7 +91,7 @@ tokenize(char *line)
 
    while (index < len)
    {
-      if (isspace(line[index]) || line[index] == 0 || line[index] == '\n')
+      if (line[index] == " ")
       {
          index++;
          continue;
@@ -100,25 +99,25 @@ tokenize(char *line)
 
       if ((line[index] == '|' && line[index + 1] == '|') || (line[index] == '&' && line[index + 1] == '&'))
       {
-         char spec[] = "xx";
-         spec[0] = line[index];
-         spec[1] = line[index + 1];
-         svec_push_back(sv, spec);
+        if(line[index] == '|')
+            char str[] = "||";
+        else
+            char str[] = "&&";
+         svec_push_back(sv, str);
          index += 2;
          continue;
       }
 
       if (line[index] == '<' || line[index] == '>' || line[index] == ';' || line[index] == '|' || line[index] == '&')
       {
-         char spec[] = "x";
-         spec[0] = line[index];
-         svec_push_back(sv, spec);
-         index++;
-         continue;
+            char x[] = "x";
+            x[0] = line[index];
+            svec_push_back(sv, x);
+            index++;
+            continue;
       }
 
-      if (line[index] != 0)
-      {
+ 
          char *arg = read_argument(line, index);
          chomp(arg);
          svec_push_back(sv, arg);
@@ -126,7 +125,7 @@ tokenize(char *line)
          free(arg);
 
          continue;
-      }
+
    }
    return sv;
 }
