@@ -109,7 +109,7 @@ void tokenize(svec* sv, char* line){
          if(strlen(token)!=0)
             svec_push_back(sv, token);
          memset(token,0,strlen(token));
-         if(i!=strlen(line) - 1 && line[i+1] == cpy){ //Encountered repeated special
+         if(i!=strlen(line) - 1 && line[i+1] == ch){ //Encountered repeated special
             // printf("Repeated!\n");
             strncat(token, &ch, 1);
             strncat(token, &ch, 1);
@@ -138,7 +138,7 @@ void tokenize(svec* sv, char* line){
    // printf("Putting 5: %s\n", token);
    trim(token);
    if(strlen(token)!=0)
-      svec_push_back(xs, token);
+      svec_push_back(sv, token);
    memset(token,0,strlen(token));
 }
 
@@ -159,7 +159,7 @@ main(int argc, char* const argv[]){
         tokenize(tokens, line);
         //print in reverse
         print_in_reverse(tokens);
-        free_svec(tokens);-
+        free_svec(tokens);
     }
     return 0;
 }
