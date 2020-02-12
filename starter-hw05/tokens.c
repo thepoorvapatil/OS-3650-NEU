@@ -88,41 +88,41 @@ tokenize(char *text)
    svec *sv = make_svec();
    //Length of the text
    int len = strlen(text);
-   int ii = 0;
+   int index = 0;
 
-   while (ii < len)
+   while (index < len)
    {
-      if (isspace(text[ii]))
+      if (isspace(text[index]))
       {
-         ++ii;
+         ++index;
          continue;
       }
 
-      if ((text[ii] == '|' && text[ii + 1] == '|') || (text[ii] == '&' && text[ii + 1] == '&'))
+      if ((text[index] == '|' && text[index + 1] == '|') || (text[index] == '&' && text[index + 1] == '&'))
       {
          char str[3];
-         str[0] = text[ii];
-         str[1] = text[ii + 1];
+         str[0] = text[index];
+         str[1] = text[index + 1];
          str[2] = 0;
          svec_push_back(sv, str);
-         ii += 2;
+         index += 2;
          continue;
       }
 
-      if (text[ii] == '<' || text[ii] == '>' || text[ii] == ';' || text[ii] == '|' || text[ii] == '&')
+      if (text[index] == '<' || text[index] == '>' || text[index] == ';' || text[index] == '|' || text[index] == '&')
       {
          char str[2];
-         str[0] = text[ii];
+         str[0] = text[index];
          str[1] = 0;
          svec_push_back(sv, str);
-         ++ii;
+         ++index;
          continue;
       }
 
-         char *word = make_word(text, ii);
+         char *word = make_word(text, index);
          chomp(word);
          svec_push_back(sv, word);
-         ii += strlen(word);
+         index += strlen(word);
          free(word);
    }
    return sv;
