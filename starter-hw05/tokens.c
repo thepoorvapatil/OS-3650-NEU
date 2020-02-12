@@ -87,7 +87,7 @@ void tokenize(svec* sv, char* line){
             
             memset(token,0,strlen(token));
             // check for double special characters
-            if(line[i+1] == ch && i!=strlen(line) - 1){ 
+            if(i!=strlen(line) - 1 && line[i+1] == ch){ 
                 // printf("Repeated!\n");
                 strncat(token, &ch, 1);
                 strncat(token, &ch, 1);
