@@ -91,16 +91,14 @@ tokenize(char *text)
 
    while (ii < len)
    {
-      if (isspace(text[ii]) || text[ii] == 0 || text[ii] == '\n')
+      if (isspace(text[ii]))
       {
-         // puts("space");
          ++ii;
          continue;
       }
 
       if ((text[ii] == '|' && text[ii + 1] == '|') || (text[ii] == '&' && text[ii + 1] == '&'))
       {
-         // puts("doubles");
          char spec[] = "xx";
          spec[0] = text[ii];
          spec[1] = text[ii + 1];
@@ -111,7 +109,6 @@ tokenize(char *text)
 
       if (text[ii] == '<' || text[ii] == '>' || text[ii] == ';' || text[ii] == '|' || text[ii] == '&')
       {
-         // puts("singles");
          char spec[] = "x";
          spec[0] = text[ii];
          svec_push_back(sv, spec);
@@ -123,7 +120,6 @@ tokenize(char *text)
          chomp(arg);
          svec_push_back(sv, arg);
          ii += strlen(arg);
-         // printf("Arg: (%s)\n", arg);
          free(arg);
    }
    return sv;
