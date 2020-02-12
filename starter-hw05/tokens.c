@@ -99,7 +99,7 @@ tokenize(char *line)
 
       if ((line[index] == '|' && line[index + 1] == '|') || (line[index] == '&' && line[index + 1] == '&'))
       {
-        char str[3];
+        char str[] = "xx";
         if(line[index] == '|')
             str[0] = "|";
             str[1] = "|";
