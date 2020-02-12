@@ -101,13 +101,13 @@ tokenize(char *line)
       {
         char str[] = "xx";
         if(line[index] == '|'){
-            str[0] = "|";
-            str[1] = "|";
+            str[0] = '|';
+            str[1] = '|';
             str[2] = 0;
         }
         else{
-            str[0] = "&";
-            str[1] = "&";
+            str[0] = '&';
+            str[1] = '&';
             str[2] = 0;
         }
          svec_push_back(sv, str);
