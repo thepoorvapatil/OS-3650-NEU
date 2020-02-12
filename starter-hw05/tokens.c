@@ -70,24 +70,24 @@ void tokenize(svec* sv, char* line){
     //go character by character throughout line
     for(int i = 0; i<strlen(line); i++){
         char ch = line[i];
-        trim(token);
         //space is delimiter 
         //If we reach a space, it's a delimiter. Push and continue. 
-
-        if(ch ==" "){
-            // trim(token);
+        if(ch == " "){
+            trim(token);
             if(strlen(token)!=0){
                 svec_push_back(sv, token);
             }
             memset(token,0,strlen(token));
         }
         else if(ch == '&' || ch == '|' || ch == '<' || ch == '>' || ch == ';'){ //If we reach a special character, push the current string to the list and empty it. 
-            // printf("Putting 2: %s\n", token);
-            // trim(token);
-            if(strlen(token)!=0)
+            trim(token);
+            if(strlen(token)!=0){
                 svec_push_back(sv, token);
+            }
+            
             memset(token,0,strlen(token));
-            if(i!=strlen(line) - 1 && line[i+1] == ch){ //Encountered repeated special
+            // check for double special characters
+            if(line[i+1] == ch && i!=strlen(line) - 1){ 
                 // printf("Repeated!\n");
                 strncat(token, &ch, 1);
                 strncat(token, &ch, 1);
