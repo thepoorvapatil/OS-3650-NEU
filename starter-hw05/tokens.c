@@ -81,58 +81,55 @@ read_argument(const char *text, int ii)
    return arg;
 }
 
-svec*
-tokenize(char *line)
+svec *
+tokenize(char *text)
 {
    svec *sv = make_svec();
-   //Length of the line
-   int index = 0;
-   int len = strlen(line);
+   //Length of the text
+   long len = strlen(text);
+   long ii = 0;
 
-   while (index < len)
+   while (ii < len)
    {
-      if (line[index] == ' ')
+      if (isspace(text[ii]) || text[ii] == 0 || text[ii] == '\n')
       {
-         index++;
+         // puts("space");
+         ++ii;
          continue;
       }
 
-      if ((line[index] == '|' && line[index + 1] == '|') || (line[index] == '&' && line[index + 1] == '&'))
+      if ((text[ii] == '|' && text[ii + 1] == '|') || (text[ii] == '&' && text[ii + 1] == '&'))
       {
-        char str[] = "xx";
-        if(line[index] == '|'){
-            str[0] = '|';
-            str[1] = '|';
-            str[2] = 0;
-        }
-        else{
-            str[0] = '&';
-            str[1] = '&';
-            str[2] = 0;
-        }
-         svec_push_back(sv, str);
-         index += 2;
+         // puts("doubles");
+         char spec[] = "xx";
+         spec[0] = text[ii];
+         spec[1] = text[ii + 1];
+         svec_push_back(sv, spec);
+         ii += 2;
          continue;
       }
 
-      if (line[index] == '<' || line[index] == '>' || line[index] == ';' || line[index] == '|' || line[index] == '&')
+      if (text[ii] == '<' || text[ii] == '>' || text[ii] == ';' || text[ii] == '|' || text[ii] == '&')
       {
-            char x[] = "x";
-            x[0] = line[index];
-            svec_push_back(sv, x);
-            index++;
-            continue;
+         // puts("singles");
+         char spec[] = "x";
+         spec[0] = text[ii];
+         svec_push_back(sv, spec);
+         ++ii;
+         continue;
       }
 
- 
-         char *arg = read_argument(line, index);
+      if (text[ii] != 0)
+      {
+         char *arg = read_argument(text, ii);
          chomp(arg);
          svec_push_back(sv, arg);
-         index += strlen(arg);
+         ii += strlen(arg);
+         // printf("Arg: (%s)\n", arg);
          free(arg);
 
          continue;
-
+      }
    }
    return sv;
 }
