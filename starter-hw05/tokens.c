@@ -86,18 +86,31 @@ svec *
 tokenize(char *text)
 {
    svec *sv = make_svec();
-   //Length of the text
-   int len = strlen(text);
+   
    int index = 0;
+   int len = strlen(text);
 
    while (index < len)
    {
+       //check for space
         if (isspace(text[index]))
         {
             ++index;
             continue;
         }
 
+        //check for single special characters
+        if (text[index] == '<' || text[index] == '>' || text[index] == ';' || text[index] == '|' || text[index] == '&')
+        {
+            char str[2];
+            str[0] = text[index];
+            str[1] = 0;
+            svec_push_back(sv, str);
+            ++index;
+            continue;
+        }
+
+        //check for double special characters
         if ((text[index] == '|' && text[index + 1] == '|') || (text[index] == '&' && text[index + 1] == '&'))
         {
             char str[3];
@@ -106,16 +119,6 @@ tokenize(char *text)
             str[2] = 0;
             svec_push_back(sv, str);
             index += 2;
-            continue;
-        }
-
-        if (text[index] == '<' || text[index] == '>' || text[index] == ';' || text[index] == '|' || text[index] == '&')
-        {
-            char str[2];
-            str[0] = text[index];
-            str[1] = 0;
-            svec_push_back(sv, str);
-            ++index;
             continue;
         }
 
@@ -149,8 +152,6 @@ main(int wordc, char* const wordv[]){
     }
     return 0;
 }
-   
-
 
 
 
