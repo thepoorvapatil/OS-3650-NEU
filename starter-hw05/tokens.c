@@ -72,7 +72,7 @@ void tokenize(svec* sv, char* line){
         char ch = line[i];
         //space is delimiter 
         //If we reach a space, it's a delimiter. Push and continue. 
-        if(ch == " "){
+        if(ch ==" "){
             trim(token);
             if(strlen(token)!=0){
                 svec_push_back(sv, token);
@@ -80,14 +80,12 @@ void tokenize(svec* sv, char* line){
             memset(token,0,strlen(token));
         }
         else if(ch == '&' || ch == '|' || ch == '<' || ch == '>' || ch == ';'){ //If we reach a special character, push the current string to the list and empty it. 
+            // printf("Putting 2: %s\n", token);
             trim(token);
-            if(strlen(token)!=0){
+            if(strlen(token)!=0)
                 svec_push_back(sv, token);
-            }
-            
             memset(token,0,strlen(token));
-            // check for double special characters
-            if(i!=strlen(line) - 1 && line[i+1] == ch){ 
+            if(i!=strlen(line) - 1 && line[i+1] == ch){ //Encountered repeated special
                 // printf("Repeated!\n");
                 strncat(token, &ch, 1);
                 strncat(token, &ch, 1);
@@ -108,17 +106,16 @@ void tokenize(svec* sv, char* line){
                 memset(token,0,strlen(token));
             }
         }
-        else{ //It's not a special character, or a space.
-            strncat(token, &ch, 1);
-        }
-        // printf("Character is: %c and is special character? %d\n", br[i], is_special((cpy)));
-    }
-    // printf("Putting 5: %s\n", token);
-    trim(token);
-    if(strlen(token)!=0){
-        svec_push_back(sv, token);
-    }
-    memset(token,0,strlen(token));
+      else{ //It's not a special character, or a space.
+         strncat(token, &ch, 1);
+      }
+      // printf("Character is: %c and is special character? %d\n", br[i], is_special((cpy)));
+   }
+   // printf("Putting 5: %s\n", token);
+   trim(token);
+   if(strlen(token)!=0)
+      svec_push_back(sv, token);
+   memset(token,0,strlen(token));
 }
 
 
