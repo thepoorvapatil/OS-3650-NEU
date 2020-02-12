@@ -13,14 +13,6 @@ read_line(char* text)
     char* line = fgets(text, 1024, stdin);
     return line;
 }
-
-// int 
-// is_special(char str){
-//    if(str == '&' || str == '|' || str == '<' || str == '>' || str == ';')
-//       return 1;
-//    return 0;
-// }
-
 void
 chomp(char* text) // reused from length-sort.c from HW04
 {
@@ -33,22 +25,6 @@ chomp(char* text) // reused from length-sort.c from HW04
 
 void trim(char *str) 
 {
-//     int i;
-//     int start_index = 0;
-//     int end_index = strlen(str) - 1;
-
-//    while (isspace((unsigned char) str[start_index])) //This is for the trailing spaces
-//       start_index++;
-
-//    while ((end_index >= start_index) && isspace((unsigned char) str[end_index])) //This is for the leading spaces
-//       end_index--;
-
-//     for (i = start_index; i <= end_index; i++)
-//         str[i - start_index] = str[i];
-
-//     str[i - start_index] = '\0';
-
-    
     // check for the leading white spaces and trim
     int index = 0;
     while(str[index] == ' ' || str[index] == '\t' || str[index] == '\n')
@@ -79,8 +55,6 @@ void trim(char *str)
     }
     // reset the character after last character as NULL */
     str[index + 1] = '\0';
-
-
 }
 
 void print_in_reverse(svec* sv){
@@ -90,56 +64,61 @@ void print_in_reverse(svec* sv){
    }
 }
 
-
-
 void tokenize(svec* sv, char* line){
-   char token[256] = "";
-   chomp(line);
-   for(int i = 0; i<strlen(line); i++){
-      char ch = line[i];
-      if(ch ==' '){ //If we reach a space, it's a delimiter. Push and continue. 
-         trim(token);
-         if(strlen(token)!=0)
-            svec_push_back(sv, token);
-         memset(token,0,strlen(token));
-      }
-      else if(ch == '&' || ch == '|' || ch == '<' || ch == '>' || ch == ';'){ //If we reach a special character, push the current string to the list and empty it. 
-         // printf("Putting 2: %s\n", token);
-         trim(token);
-         if(strlen(token)!=0)
-            svec_push_back(sv, token);
-         memset(token,0,strlen(token));
-         if(i!=strlen(line) - 1 && line[i+1] == ch){ //Encountered repeated special
-            // printf("Repeated!\n");
-            strncat(token, &ch, 1);
-            strncat(token, &ch, 1);
-            i++;
-            // printf("Putting 3: %s\n", token);
-            trim(token);
-            if(strlen(token)!=0)
-               svec_push_back(sv, token);
+    char token[256] = "";
+    chomp(line);
+    //go character by character throughout line
+    for(int i = 0; i<strlen(line); i++){
+        char ch = line[i];
+        trim(token);
+        //space is delimiter 
+        //If we reach a space, it's a delimiter. Push and continue. 
+
+        if(ch ==" "){
+            // trim(token);
+            if(strlen(token)!=0){
+                svec_push_back(sv, token);
+            }
             memset(token,0,strlen(token));
-         }
-         else{ //Encountered non-repeat special
-            // printf("Non repeated!\n");
-            strncat(token, &ch, 1);
-            // printf("Putting 4: %s\n", token);
-            trim(token);
+        }
+        else if(ch == '&' || ch == '|' || ch == '<' || ch == '>' || ch == ';'){ //If we reach a special character, push the current string to the list and empty it. 
+            // printf("Putting 2: %s\n", token);
+            // trim(token);
             if(strlen(token)!=0)
-               svec_push_back(sv, token);
+                svec_push_back(sv, token);
             memset(token,0,strlen(token));
-         }
-      }
-      else{ //It's not a special character, or a space.
-         strncat(token, &ch, 1);
-      }
-      // printf("Character is: %c and is special character? %d\n", br[i], is_special((cpy)));
-   }
-   // printf("Putting 5: %s\n", token);
-   trim(token);
-   if(strlen(token)!=0)
-      svec_push_back(sv, token);
-   memset(token,0,strlen(token));
+            if(i!=strlen(line) - 1 && line[i+1] == ch){ //Encountered repeated special
+                // printf("Repeated!\n");
+                strncat(token, &ch, 1);
+                strncat(token, &ch, 1);
+                i++;
+                // printf("Putting 3: %s\n", token);
+                trim(token);
+                if(strlen(token)!=0)
+                svec_push_back(sv, token);
+                memset(token,0,strlen(token));
+            }
+            else{ //Encountered non-repeat special
+                // printf("Non repeated!\n");
+                strncat(token, &ch, 1);
+                // printf("Putting 4: %s\n", token);
+                trim(token);
+                if(strlen(token)!=0)
+                svec_push_back(sv, token);
+                memset(token,0,strlen(token));
+            }
+        }
+        else{ //It's not a special character, or a space.
+            strncat(token, &ch, 1);
+        }
+        // printf("Character is: %c and is special character? %d\n", br[i], is_special((cpy)));
+    }
+    // printf("Putting 5: %s\n", token);
+    trim(token);
+    if(strlen(token)!=0){
+        svec_push_back(sv, token);
+    }
+    memset(token,0,strlen(token));
 }
 
 
@@ -155,7 +134,7 @@ main(int argc, char* const argv[]){
         if (!line) {
             exit(0);
         }
-        //tokenize
+        //tokenize line and store in tokens
         tokenize(tokens, line);
         //print in reverse
         print_in_reverse(tokens);
