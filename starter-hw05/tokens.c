@@ -201,7 +201,7 @@ int
 main(int argc, char* const argv[]){
 
     while (1) {
-        svec* tokens = make_svec();
+        // svec* tokens = make_svec();
         printf("tokens$ ");
         fflush(stdout);
         char text[1024];
@@ -210,7 +210,7 @@ main(int argc, char* const argv[]){
             exit(0);
         }
         //tokenize
-        tokens = tokenize(line);
+        svec* tokens = tokenize(line);
         //print in reverse
         print_in_reverse(tokens);
         free_svec(tokens);
