@@ -66,6 +66,7 @@ print_in_reverse(svec* sv){
    }
 }
 
+//return word before sp char
 char *
 make_word(const char *text, int ii)
 {
@@ -86,8 +87,8 @@ tokenize(char *text)
 {
    svec *sv = make_svec();
    //Length of the text
-   long len = strlen(text);
-   long ii = 0;
+   int len = strlen(text);
+   int ii = 0;
 
    while (ii < len)
    {
@@ -126,71 +127,6 @@ tokenize(char *text)
    }
    return sv;
 }
-
-// void tokenize(svec* sv, char*)
-//     char token[256] = "";
-//     chomp(line);
-//     for(int i = 0; i<strlen(line); i++){
-//         char ch = line[i];
-
-//         //space. pushback into sv
-//         if(ch == " "){ 
-//             trim(token);
-//             //if not empty
-//             if(strlen(token)!=0){
-//                 svec_push_back(sv, token);
-//             }
-//             memset(token,0,strlen(token));
-//         }
-
-//         //check for strial character
-//         else if(ch == '&' || ch == '|' || ch == '<' || ch == '>' || ch == ';'){ 
-            
-//             trim(token);
-//             //if not empty
-//             if(strlen(token)!=0)
-//                 svec_push_back(sv, token);
-//             memset(token,0,strlen(token));
-
-//             //check for repeated strial character
-//             if(i<strlen(line)-1 && ch == line[i+1]){ 
-
-//                 strncat(token, &ch, 1);
-//                 strncat(token, &ch, 1);
-//                 i++;
-//                 //trim
-//                 trim(token);
-//                 //if not empty
-//                 if(strlen(token)!=0){
-//                     svec_push_back(sv, token);
-//                 }
-//                 memset(token,0,strlen(token));
-//             }
-//             //if its not repeated strial character
-//             else{ 
-//                 strncat(token, &ch, 1);
-//                 trim(token);
-//                 //if not empty
-//                 if(strlen(token)!=0){
-//                     svec_push_back(sv, token);
-//                 }
-//                 memset(token,0,strlen(token));
-//             }
-//         }
-//         //non strial non space character
-//         else{ 
-//             strncat(token, &ch, 1);
-//         }
-//     }
-//     //trim
-//     trim(token);
-
-//     //if not empty
-//     if(strlen(token)!=0){
-//         svec_push_back(sv, token);
-//     }
-//     memset(token,0,strlen(token));
-// }
 
 
 int 
