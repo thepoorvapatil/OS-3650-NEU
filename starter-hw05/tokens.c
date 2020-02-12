@@ -100,14 +100,16 @@ tokenize(char *line)
       if ((line[index] == '|' && line[index + 1] == '|') || (line[index] == '&' && line[index + 1] == '&'))
       {
         char str[] = "xx";
-        if(line[index] == '|')
+        if(line[index] == '|'){
             str[0] = "|";
             str[1] = "|";
             str[2] = 0;
-        else
+        }
+        else{
             str[0] = "&";
             str[1] = "&";
             str[2] = 0;
+        }
          svec_push_back(sv, str);
          index += 2;
          continue;
