@@ -121,16 +121,9 @@ execute(shell_ast* ast)
 
 void processInput(char* cmd){
 	
-	//Converting command froms tring to resizable array of strings.
 	svec *vector = tokenize(cmd);
-
-	//Converting the array of strings into an Abstract Sintax Tree.
 	shell_ast* ast = parse(vector);
-	
-	//Freeing array of strings because we don't need it anymore. 
 	free(vector);
-	
-	//Executing command. 
 	execute(ast);
 }
 
@@ -159,7 +152,10 @@ main(int argc, char* argv[])
 					continue;
 				}
 
-				processInput(cmd);
+				svec *vector = tokenize(cmd);
+                shell_ast* ast = parse(vector);
+                free(vector);
+                execute(ast);
 			}
 
     		} 
@@ -175,7 +171,10 @@ main(int argc, char* argv[])
 			}
 
 			while (fgets(buffer, 100, f) != NULL){
-				processInput(buffer);
+				svec *vector = tokenize(buffer);
+                shell_ast* ast = parse(vector);
+                free(vector);
+                execute(ast);
 			}
 			
 			//Close file 
