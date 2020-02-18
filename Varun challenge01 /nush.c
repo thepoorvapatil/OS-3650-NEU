@@ -176,7 +176,8 @@ execute(calc_ast* ast)
 
 void processInput(char* cmd){
 
-	svec *vector = push_tokenise(cmd);
+	svec *vector = make_svec();
+  push_tokenise(vector, cmd);
 	calc_ast* ast = parse(vector);
 
 	free(vector);
