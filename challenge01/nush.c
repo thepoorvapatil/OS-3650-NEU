@@ -87,6 +87,50 @@ read_token(const char* str, int ii){
 // 	return vector;
 // }
 
+void
+chomp(char* text) // reused from length-sort.c from HW04
+{
+    // TODO: Modify input string to remove trailing newline ('\n')
+    int l=strlen(text)-1;
+    if( text[l] == '\n'){
+        text[l] = '\0';
+    }
+}
+
+void trim(char *str) 
+{
+    // check for the leading white spaces and trim
+    int index = 0;
+    while(str[index] == ' ' || str[index] == '\t' || str[index] == '\n')
+    {
+        index++;
+    }
+
+    // move all characters to its left replacing the leading white spaces
+    int i = 0;
+    while(str[i + index] != '\0')
+    {
+        str[i] = str[i + index];
+        i++;
+    }
+    // string ends with NULL
+    str[i] = '\0'; 
+
+    //check till end of string for trailing white spaces and trim
+    index = -1;
+    i = 0;
+    while(str[i] != '\0')
+    {
+        if(str[i] != ' ' && str[i] != '\t' && str[i] != '\n')
+        {
+            index = i;
+        }
+        i++;
+    }
+    // reset the character after last character as NULL */
+    str[index + 1] = '\0';
+}
+
 void 
 tokenize(svec* sv, char* line){
     char token[256] = "";
