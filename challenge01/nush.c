@@ -86,7 +86,7 @@ tokenize (const char* str) {
 }
 
 void
-execute(char* cmd)
+execute(shell_ast* ast)
 {
     if( ast->isOperator = 0 ){
 
