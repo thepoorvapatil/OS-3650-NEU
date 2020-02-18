@@ -4,6 +4,10 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include "svec.h"
+#include "ast.h"
+#include "parse.h"
+
 
 void trim_spcaes(char *string){
 
@@ -35,7 +39,7 @@ void trim_spcaes(char *string){
   string[counter + 1] = '\0';
 }
 
-chomp(char* text)
+void chomp(char* text)
 {
   // remove trailing newline from string
   strtok(text, "\n");
