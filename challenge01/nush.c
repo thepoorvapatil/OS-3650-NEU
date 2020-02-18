@@ -140,7 +140,7 @@ tokenize(svec* sv, char* line){
         char ch = line[i];
         //space is delimiter 
         //If we reach a space, it's a delimiter. Push and continue. 
-        if(ch ==" "){
+        if(ch == ' '){
             trim(token);
             if(strlen(token)!=0){
                 svec_push_back(sv, token);
