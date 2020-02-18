@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <errno.h>
 #include "ast.h"
 #include "parse.h"
 #include "svec.h"
