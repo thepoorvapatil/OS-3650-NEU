@@ -116,7 +116,7 @@ void push_tokenise(svec* aa , char* bb){
 }
 
 void
-execute(char* cmd)
+execute(shell_ast* ast)
 {
     int cpid;
 
@@ -180,7 +180,7 @@ main(int argc, char* argv[])
         fflush(stdout);
         char* output = fgets(cmd, 256, stdin);
         if (!output){
-          print("\n");
+          printf("\n");
         }
     }
     else {
