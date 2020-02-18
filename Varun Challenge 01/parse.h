@@ -2,7 +2,7 @@
 #define PARSE_H
 
 #include "ast.h"
-#include "list.h"
+#include "svec.h"
 
 calc_ast* parse(list* toks);
 
