@@ -121,24 +121,26 @@ execute(shell_ast* ast)
         }
         else {
             // child process
-            printf("Child pid: %d\n", getpid());
-            printf("Child knows parent pid: %d\n", getppid());
 
-            for (int ii = 0; ii < strlen(cmd); ++ii) {
-                if (cmd[ii] == ' ') {
-                    cmd[ii] = 0;
-                    break;
-                }
-            }
+            ast_eval(ast);
+            // printf("Child pid: %d\n", getpid());
+            // printf("Child knows parent pid: %d\n", getppid());
 
-            // The argv array for the child.
-            // Terminated by a null pointer.
-            char* args[] = {cmd, "one", 0};
+            // for (int ii = 0; ii < strlen(cmd); ++ii) {
+            //     if (cmd[ii] == ' ') {
+            //         cmd[ii] = 0;
+            //         break;
+            //     }
+            // }
 
-            printf("== executed program's output: ==\n");
+            // // The argv array for the child.
+            // // Terminated by a null pointer.
+            // char* args[] = {cmd, "one", 0};
 
-            execvp(cmd, args);
-            printf("Can't get here, exec only returns on error.");
+            // printf("== executed program's output: ==\n");
+
+            // execvp(cmd, args);
+            // printf("Can't get here, exec only returns on error.");
         }
     }
 }
