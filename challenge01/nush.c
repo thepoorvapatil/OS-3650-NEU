@@ -49,42 +49,97 @@ read_token(const char* str, int ii){
 	return token; 
 }
 
-svec* 
-tokenize (const char* text) {
+// svec* 
+// tokenize (const char* text) {
 	
-	svec* vector = make_svec();
-	int nn = strlen(text);
-	int ii = 0;
-	char *token;
+// 	svec* vector = make_svec();
+// 	int nn = strlen(text);
+// 	int ii = 0;
+// 	char *token;
 
-	while (ii < nn) {
+// 	while (ii < nn) {
 	
-		if(isspace(text[ii])){
-			ii++; //if it is an space we skip it. 
+// 		if(isspace(text[ii])){
+// 			ii++; //if it is an space we skip it. 
 
-		} else {
-			int opLength = isOperator(text, ii);
+// 		} else {
+// 			int opLength = isOperator(text, ii);
 
-			if (opLength == 0) {
-				//it is not an operator
-				token = read_token(text, ii);
-				svec_push_back(vector, token);
-				ii += strlen(token);	
-			} else {
-				//it is an operator
-				token = malloc(opLength + 1);
-				memcpy(token, text + ii, opLength);
-				token[opLength] = 0;
-				svec_push_back(vector, token);
-				ii += opLength;		
-			}
-			free(token);
+// 			if (opLength == 0) {
+// 				//it is not an operator
+// 				token = read_token(text, ii);
+// 				svec_push_back(vector, token);
+// 				ii += strlen(token);	
+// 			} else {
+// 				//it is an operator
+// 				token = malloc(opLength + 1);
+// 				memcpy(token, text + ii, opLength);
+// 				token[opLength] = 0;
+// 				svec_push_back(vector, token);
+// 				ii += opLength;		
+// 			}
+// 			free(token);
 
-		}
+// 		}
 
-	}
+// 	}
 
-	return vector;
+// 	return vector;
+// }
+
+void 
+tokenize(svec* sv, char* line){
+    char token[256] = "";
+    chomp(line);
+    //go character by character throughout line
+    for(int i = 0; i<strlen(line); i++){
+        char ch = line[i];
+        //space is delimiter 
+        //If we reach a space, it's a delimiter. Push and continue. 
+        if(ch ==" "){
+            trim(token);
+            if(strlen(token)!=0){
+                svec_push_back(sv, token);
+            }
+            memset(token,0,strlen(token));
+        }
+        else if(ch == '&' || ch == '|' || ch == '<' || ch == '>' || ch == ';'){ //If we reach a special character, push the current string to the list and empty it. 
+            // printf("Putting 2: %s\n", token);
+            trim(token);
+            if(strlen(token)!=0)
+                svec_push_back(sv, token);
+            memset(token,0,strlen(token));
+            if(i!=strlen(line) - 1 && line[i+1] == ch){ //Encountered repeated special
+                // printf("Repeated!\n");
+                strncat(token, &ch, 1);
+                strncat(token, &ch, 1);
+                i++;
+                // printf("Putting 3: %s\n", token);
+                trim(token);
+                if(strlen(token)!=0)
+                svec_push_back(sv, token);
+                memset(token,0,strlen(token));
+            }
+            else{ //Encountered non-repeat special
+                // printf("Non repeated!\n");
+                strncat(token, &ch, 1);
+                // printf("Putting 4: %s\n", token);
+                trim(token);
+                if(strlen(token)!=0)
+                svec_push_back(sv, token);
+                memset(token,0,strlen(token));
+            }
+        }
+      else{ //It's not a special character, or a space.
+         strncat(token, &ch, 1);
+      }
+      // printf("Character is: %c and is special character? %d\n", br[i], is_special((cpy)));
+   }
+   // printf("Putting 5: %s\n", token);
+   trim(token);
+   if(strlen(token)!=0)
+      svec_push_back(sv, token);
+   memset(token,0,strlen(token));
 }
 
 void
@@ -119,45 +174,48 @@ execute(shell_ast* ast)
 	}
 }
 
-void processInput(char* cmd){
+// void processInput(char* cmd){
 	
-	svec *vector = tokenize(cmd);
-	shell_ast* ast = parse(vector);
-	free(vector);
-	execute(ast);
-}
+// 	svec *vector = tokenize(cmd);
+// 	shell_ast* ast = parse(vector);
+// 	free(vector);
+// 	execute(ast);
+// }
 
 
 int
 main(int argc, char* argv[])
 {
 
+            // svec* tokens = make_svec();
+
     		char cmd[256];
 
     		if (argc == 1) {
 
-			while(1) {
+                while(1) {
 
-        		printf("nush$ ");
-				fflush(stdout);
-			    fgets(cmd, 256, stdin);
+                    printf("nush$ ");
+                    fflush(stdout);
+                    fgets(cmd, 256, stdin);
 
-				// if (!rtrn){
-				// 	//Breaking in case user wants to end. 
-				// 	printf("\n");
-				// 	break;
-				// }
+                    // if (!rtrn){
+                    // 	//Breaking in case user wants to end. 
+                    // 	printf("\n");
+                    // 	break;
+                    // }
 
-				if(strlen(cmd) == 1){
-					continue;
-				}
+                    if(strlen(cmd) == 1){
+                        continue;
+                    }
 
-				svec *vector = tokenize(cmd);
-                shell_ast* ast = parse(vector);
-                free(vector);
-                execute(ast);
-			}
-
+                    // svec *vector = tokenize(cmd);
+                    svec* tokens = make_svec();
+                    tokenize(tokens, cmd);
+                    shell_ast* ast = parse(tokens);
+                    free(tokens);
+                    execute(ast);
+			    }
     		} 
             else {
                 //file input
@@ -171,9 +229,11 @@ main(int argc, char* argv[])
 			}
 
 			while (fgets(buffer, 100, f) != NULL){
-				svec *vector = tokenize(buffer);
-                shell_ast* ast = parse(vector);
-                free(vector);
+				// svec *vector = tokenize(buffer);
+                svec* tokens = make_svec();
+                tokenize(tokens, buffer);
+                shell_ast* ast = parse(tokens);
+                free(tokens);
                 execute(ast);
 			}
 			
