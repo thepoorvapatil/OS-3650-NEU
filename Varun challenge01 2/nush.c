@@ -8,6 +8,19 @@
 #include "ast.h"
 #include "parse.h"
 
+int
+check_special(char string){
+    int counter = 0;
+    if (string == '<'){counter+=1;}
+    if (string == '>'){counter+=1;}
+    if (string == ';'){counter+=1;}
+    if (string == '&'){counter+=1;}
+    if (string == '|'){counter+=1;}
+    if (counter > 0){
+      return 1;
+    }
+    return 0;
+}
 
 void trim_spcaes(char *string){
 
@@ -163,7 +176,7 @@ execute(shell_ast* ast)
 
 void processInput(char* cmd){
 
-	svec *vector = tokenize(cmd);
+	svec *vector = push_tokenize(cmd);
 	shell_ast* ast = parse(vector);
 
 	free(vector);
@@ -182,12 +195,18 @@ main(int argc, char* argv[])
         if (!output){
           printf("\n");
         }
+      processInput(cmd);
     }
     else {
-      memcpy(cmd, "echo", 5);
+      char buffer[100];
+			FILE* file = fopen(argv[1], "r");
+    
+    while (fgets(buffer, 100, file) != NULL){
+				//We process the command that each line repesents.
+				processInput(buffer);
+			}	
+      fclose(file);
     }
-
-    execute(cmd);
 
     return 0;
 }
