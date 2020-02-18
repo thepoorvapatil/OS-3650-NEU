@@ -32,18 +32,15 @@ contains(list* toks, const char* tt)
 }
 
 list*
-slice(list* xs, int i0, int i1)
+slice(svec* toks, int first, int last)
 {
-    list* ys = 0;
-    list* it = xs;
-    for (int ii = 0; ii < i0; ++ii) {
-        it = it->tail;
+    svec* vector = make_svec();
+
+    for (int a = first; a < last; ++a) {
+        char* token = svec_get(toks, xx);
+        svec_push_back(vector, token);
     }
-    for (int ii = i0; ii < i1; ++ii) {
-        ys = cons(it->head, ys);
-        it = it->tail;
-    }
-    return ys;
+    return vector;
 }
 
 calc_ast*
