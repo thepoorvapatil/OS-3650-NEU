@@ -43,7 +43,7 @@ slice(svec* toks, int first, int last)
     return vector;
 }
 
-shell_ast*
+calc_ast*
 parse(list* toks)
 {
     if (length(toks) == 1) {
@@ -60,7 +60,7 @@ parse(list* toks)
             int jj = find_first_index(toks, op);
             list* xs = slice(toks, 0, jj);
             list* ys = slice(toks, jj + 1, length(toks));
-            shell_ast* ast = make_ast_op(op[0], parse(xs), parse(ys));
+            calc_ast* ast = make_ast_op(op[0], parse(xs), parse(ys));
             free(xs);
             free(ys);
             return ast;

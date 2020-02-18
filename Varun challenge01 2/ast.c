@@ -3,11 +3,11 @@
 
 #include "ast.h"
 
-shell_ast*
+calc_ast*
 make_ast_value(int vv)
 {
     //initialising the values, in a effective but space inefficientg way
-    shell_ast* ast = malloc(sizeof(shell_ast));
+    calc_ast* ast = malloc(sizeof(calc_ast));
     ast->op = '=';
     ast->arg0 = 0;
     ast->arg1 = 0;
@@ -19,14 +19,14 @@ make_ast_value(int vv)
 }
 
 char*
-command_get(shell_ast* ast){
+command_get(calc_ast* ast){
     char* m = malloc(16);
     sprintf(m, "%s", ast->cmd);
     return m;
 }
 
 void
-argument_get(shell_ast* ast, char** arguments){
+argument_get(calc_ast* ast, char** arguments){
     // command will always be the first element and last element will be null
     argument[0] = ast->cmd;
     arguments[ast->args->size + 1] = 0;
@@ -66,19 +66,19 @@ routput(char* noutput){
 }
 
 void
-evaluate_command(shell_ast* ast){
+evaluate_command(calc_ast* ast){
     char* c = get_command(ast);
 
     int count = ast->args->size;
     char* arguments[count +2];
     argument_get(ast, arguments);
-    free_shell_ast(ast);
+    free_calc_ast(ast);
     execvp(c, arguments);
 
 }
 
 void
-evaluate_redir(shell_ast* ast){
+evaluate_redir(calc_ast* ast){
     printf("%s", ast->file);
 
     if (strcmp(ast->op, "<") != 0){
@@ -92,12 +92,12 @@ evaluate_redir(shell_ast* ast){
     int count = ast->args->size;
     char* arguments[count +2];
     argument_get(ast, arguments);
-    free_shell_ast(ast);
+    free_calc_ast(ast);
     execvp(c, arguments);
 }
 
 void
-free_ast(shell_ast* ast)
+free_ast(calc_ast* ast)
 {
     if (ast->arg0) {
         free_ast(ast->arg0);
@@ -109,13 +109,13 @@ free_ast(shell_ast* ast)
 }
 
 int
-ast_eval(shell_ast* ast)
+ast_eval(calc_ast* ast)
 {
     return 5;
 }
 
 char*
-ast_string(shell_ast* ast)
+ast_string(calc_ast* ast)
 {
     if (ast->op == 0) {
         char* tmp = malloc(16); 
@@ -139,7 +139,7 @@ ast_string(shell_ast* ast)
 }
 
 void
-print_ast(shell_ast* ast)
+print_ast(calc_ast* ast)
 {
     char* text = ast_string(ast);
     printf("%s\n", text);

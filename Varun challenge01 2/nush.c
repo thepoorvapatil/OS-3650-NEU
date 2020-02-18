@@ -129,7 +129,7 @@ void push_tokenise(svec* aa , char* bb){
 }
 
 void
-execute(shell_ast* ast)
+execute(calc_ast* ast)
 {
     int cpid;
 
@@ -177,7 +177,7 @@ execute(shell_ast* ast)
 void processInput(char* cmd){
 
 	svec *vector = push_tokenize(cmd);
-	shell_ast* ast = parse(vector);
+	calc_ast* ast = parse(vector);
 
 	free(vector);
 	execute(ast);

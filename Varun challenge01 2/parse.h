@@ -4,6 +4,6 @@
 #include "ast.h"
 #include "svec.h"
 
-shell_ast* parse(svec* tokens);
+calc_ast* parse(svec* tokens);
 
 #endif
