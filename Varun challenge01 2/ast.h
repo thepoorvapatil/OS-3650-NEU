@@ -1,6 +1,8 @@
 #ifndef CALC_AST_H
 #define CALC_AST_H
 
+#include "svec.h"
+
 typedef struct calc_ast {
     char op;
     // op is either:

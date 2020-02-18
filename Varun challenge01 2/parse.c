@@ -12,7 +12,7 @@ streq(const char* aa, const char* bb)
 }
 
 int
-find_first_index(list* toks, const char* tt)
+find_first_index(svec* toks, const char* tt)
 {
     int ii = 0;
     for (list* it = toks; it; it = it->tail) {
@@ -26,7 +26,7 @@ find_first_index(list* toks, const char* tt)
 }
 
 int
-contains(list* toks, const char* tt)
+contains(svec* toks, const char* tt)
 {
     return find_first_index(toks, tt) != -1;
 }
@@ -37,14 +37,14 @@ slice(svec* toks, int first, int last)
     svec* vector = make_svec();
 
     for (int a = first; a < last; ++a) {
-        char* token = svec_get(toks, xx);
+        char* token = svec_get(toks, a);
         svec_push_back(vector, token);
     }
     return vector;
 }
 
 calc_ast*
-parse(list* toks)
+parse(svec* toks)
 {
     if (length(toks) == 1) {
         int vv = atoi(toks->head);
