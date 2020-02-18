@@ -15,7 +15,7 @@ int
 find_first_index(svec* toks, const char* tt)
 {
     int ii = 0;
-    for (list* it = toks; it; it = it->tail) {
+    for (svec* it = toks; it; it = it->tail) {
         if (streq(it->head, tt)) {
             return ii;
         }
@@ -31,7 +31,7 @@ contains(svec* toks, const char* tt)
     return find_first_index(toks, tt) != -1;
 }
 
-list*
+svec*
 slice(svec* toks, int first, int last)
 {
     svec* vector = make_svec();
@@ -58,8 +58,8 @@ parse(svec* toks)
 
         if (contains(toks, op)) {
             int jj = find_first_index(toks, op);
-            list* xs = slice(toks, 0, jj);
-            list* ys = slice(toks, jj + 1, length(toks));
+            svec* xs = slice(toks, 0, jj);
+            svec* ys = slice(toks, jj + 1, length(toks));
             calc_ast* ast = make_ast_op(op[0], parse(xs), parse(ys));
             free(xs);
             free(ys);
