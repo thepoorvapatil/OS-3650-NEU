@@ -19,7 +19,7 @@ typedef struct shell_ast {
 	//file
 	char* file;
 	
-	//separtor
+	//separator
 	int isOperator; 
 
 } shell_ast;

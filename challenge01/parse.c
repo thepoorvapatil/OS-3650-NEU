@@ -1,10 +1,9 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
-
+#include "svec.h"
 #include "ast.h"
 #include "parse.h"
-#include "svec.h"
 
 int 
 streq(const char* aa, const char* bb){
@@ -21,10 +20,8 @@ find_first_index(svec* toks, const char* tt){
 				return ii;
 			}		
 		}
-
 		return -1;
 }
-
 
 int 
 contains(svec* toks, const char* tt){
@@ -37,7 +34,7 @@ slice(svec* toks, int start, int end){
 		
 	svec* sv = make_svec();
 
-	for(int ii = start; ii < end; ii++){
+	for(int ii = start; ii < end; ++ii){
 		char* token = svec_get(toks, ii);
 		svec_push_back(sv, token);
 	}
@@ -52,7 +49,7 @@ parse(svec* toks){
 	const char* operators[] = {";", "|", "||", "&", "&&", "<", ">"};
 
 	int opp = 0;
-	for (int ii= 0; ii < sizeof(operators); ii++){
+	for (int ii= 0; ii < sizeof(operators); ++ii){
 		const char* operator = operators[ii];
 		
 		if(contains(toks, operator)){
