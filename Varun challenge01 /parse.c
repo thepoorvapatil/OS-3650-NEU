@@ -45,10 +45,10 @@ slice(svec* toks, int first, int last)
 calc_ast*
 parse(svec* toks)
 {
-    if (length(toks) == 1) {
-        int vv = atoi(toks->head);
-        return make_ast_value(vv);
-    }
+    // if (length(toks) == 1) {
+    //     // int vv = atoi(toks->head);
+    //     return make_ast_value(vv);
+    // }
 
     const char* ops[] = {"+", "-", "*", "/"};
 
