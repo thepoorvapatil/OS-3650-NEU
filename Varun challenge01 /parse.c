@@ -14,15 +14,14 @@ streq(const char* aa, const char* bb)
 int
 find_first_index(svec* toks, const char* tt)
 {
-    int ii = 0;
-    for (svec* it = toks; it; it = it->tail) {
-        if (streq(it->head, tt)) {
-            return ii;
-        }
-        ii++;
-    }
+    or (int ii=0; ii < toks->size; ++ii){
+			char* token = svec_get(toks, ii);
+			if( streq(token, tt) ){
+				return ii;
+			}		
+		}
 
-    return -1;
+		return -1;
 }
 
 int
