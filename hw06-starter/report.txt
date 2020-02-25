@@ -1,0 +1,36 @@
+
+My local machine specs:
+operating system: macOS Catalina 10.15.3
+processor model: 2.3 GHz Dual-Core Intel Core i5
+number of processor cores: 2
+amount of RAM: 8GB
+
+My virtual machine specs:
+operating system: Debian (64-bit)
+processor model: 
+number of processor cores: 2
+amount of RAM: 2048 MB
+
+CCIS server specs:
+operating system: CentOS Linux 7 (core)
+processor model: Intel(R) Xeon(R) Gold 5118 CPU @ 2.30 GHz
+number of processor cores: 12
+amount of RAM: 196294968 kB
+
+
++---------------+-----------+---------------+------------------+
+|               | processes | measured time | parallel speedup |
++---------------+-----------+---------------+------------------+
+| local machine |         1 |          9.88 |                1 |
+|               |         4 |           6.2 |             0.25 |
+|               |         8 |          5.85 |            0.125 |
+| CCIS server   |         1 |         56.32 |                1 |
+|               |         4 |          24.4 |             0.25 |
+|               |         8 |         20.59 |            0.125 |
++---------------+-----------+---------------+------------------+
+
+
+
+
+
+
