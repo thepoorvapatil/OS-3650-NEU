@@ -79,12 +79,12 @@ sort_worker(int pnum, float* data, long size, int P, floats* samps, long* sizes,
     barrier_wait(bb);
     // start = sum(sizes[0 to p - 1]) # that’s sum(zero items) = 0 for p = 0
     long start=0;
-    for(int ii=0; ii<pnum-1; ii++){
+    for(int ii=0; ii<pnum; ii++){
         start+=sizes[ii];
     }
     // end = sum(sizes[0 to p]) # that’s sum(1 item) for p = 0
     long end=0;
-    for(int ii=0; ii<pnum; ii++){
+    for(int ii=0; ii<pnum+1; ii++){
         end+=sizes[ii];
     }
 
@@ -172,7 +172,7 @@ main(int argc, char* argv[])
     check_rv(fd);
 
     void* file = malloc(1024); // TODO: load the file with mmap.
-    (void) file; // suppress unused warning.
+    // (void) file; // suppress unused warning.
 
     long* sizePointer = mmap(0, sizeof(long), PROT_READ, MAP_PRIVATE | MAP_FILE , fd, 0);
     long size = sizePointer[0];
