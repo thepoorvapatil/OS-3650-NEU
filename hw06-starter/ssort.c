@@ -32,8 +32,8 @@ sample(float* data, long size, int P)
 {
     // TODO: sample the input data, per the algorithm decription
     // 
-    floats* float_arr = make_floats(1);
-
+    floats* float_arr = make_floats(0);
+    floats_push(float_arr, FLT_MIN);
     //stores samples
     floats* samples_arr = make_floats(0);
 
