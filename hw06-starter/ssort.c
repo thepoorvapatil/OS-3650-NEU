@@ -51,7 +51,7 @@ sample(float* data, long size, int P)
     //push infinity end val
     floats_push(float_arr, FLT_MAX);
 
-    floats_print(float_arr);
+    // floats_print(float_arr);
     return float_arr;
 
 }
@@ -59,16 +59,41 @@ sample(float* data, long size, int P)
 void
 sort_worker(int pnum, float* data, long size, int P, floats* samps, long* sizes, barrier* bb)
 {
-    floats* xs = make_floats(10);
+    floats* xs = make_floats(0);
     // TODO: select the floats to be sorted by this worker
+
+    for(int ii=0; ii<size; ii++){
+        if(samps->data[pnum]<=data[ii]< samps->data[pnum+1]){
+            floats_push(xs, data[ii]);
+        }
+    }
 
     printf("%d: start %.04f, count %ld\n", pnum, samps->data[pnum], xs->size);
 
     // TODO: some other stuff
+    //stores no of elements in the counts
+    sizes[pnum]=xs->size;
+
+    barrier_wait(bb);
+    // start = sum(sizes[0 to p - 1]) # that’s sum(zero items) = 0 for p = 0
+    long start=0;
+    for(int ii=0; ii<pnum-1; ii++){
+        start+=sizes[ii];
+    }
+    // end = sum(sizes[0 to p]) # that’s sum(1 item) for p = 0
+    long end=0;
+    for(int ii=0; ii<pnum; ii++){
+        end+=sizes[ii];
+    }
 
     qsort_floats(xs);
 
+    barrier_wait(bb);
+
     // TODO: probably more stuff
+    for(int ii=0; ii<xs->size; ii++){
+        data[ start+ii]=xs->data[ii];
+    }
 
     free_floats(xs);
 }
@@ -77,13 +102,32 @@ void
 run_sort_workers(float* data, long size, int P, floats* samps, long* sizes, barrier* bb)
 {
     pid_t kids[P];
-    (void) kids; // suppress unused warning
+    // (void) kids; // suppress unused warning
+
+    
+
+    // for (int pp = 0; pp < 10; ++pp) {
+    //     waitpid(kids[pp], 0, 0);
+    // }
 
     // TODO: spawn P processes, each running sort_worker
 
+    for (int pp = 0; pp < P; ++pp) {
+        if ((kids[pp] = fork())) {
+            // do nothing
+
+            //parent
+        }
+        else {
+            //child process
+            sort_worker(pp , data, size, P, samps, sizes, bb);
+            exit(0);
+        }
+    }
+
     for (int ii = 0; ii < P; ++ii) {
-        //int rv = waitpid(kids[ii], 0, 0);
-        //check_rv(rv);
+        int rv = waitpid(kids[ii], 0, 0);
+        check_rv(rv);
     }
 }
 
