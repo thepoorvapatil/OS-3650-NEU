@@ -51,6 +51,8 @@ sample(float* data, long size, int P)
     //push infinity end val
     floats_push(float_arr, FLT_MAX);
 
+    free_floats(samples_arr);
+
     // floats_print(float_arr);
     return float_arr;
 
