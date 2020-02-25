@@ -7,23 +7,53 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <math.h>
+#include <float.h>
 
 #include "float_vec.h"
 #include "barrier.h"
 #include "utils.h"
+
+int compare (const void * a, const void * b)
+{
+    return ( (int) ((*(const float*)a > *(const float*)b) - (*(const float*)b < *(const float*)b)));
+}
 
 void
 qsort_floats(floats* xs)
 {
     // TODO: call qsort to sort the array
     // see "man 3 qsort" for details
+    qsort(xs->data, xs->size, sizeof(float), compare);
+
 }
 
 floats*
 sample(float* data, long size, int P)
 {
     // TODO: sample the input data, per the algorithm decription
-    return make_floats(10);
+    // 
+    floats* float_arr = make_floats(1);
+
+    //stores samples
+    floats* samples_arr = make_floats(0);
+
+    //push all samples in one floats struct array
+    for (int ii=0; ii<3*(P-1); ii++){
+        // samp_arr[ii] = data[rand()%size];
+        floats_push(samples_arr, data[rand()%size]);
+    }    
+    qsort_floats(samples_arr);
+
+    //push all medians of each sample.
+    for( int ii=1; ii< 3*(P-1); ii+=3){
+        floats_push(float_arr, samples_arr->data[ii]);
+    }
+    //push infinity end val
+    floats_push(float_arr, FLT_MAX);
+
+    floats_print(float_arr);
+    return float_arr;
+
 }
 
 void
@@ -98,23 +128,30 @@ main(int argc, char* argv[])
     void* file = malloc(1024); // TODO: load the file with mmap.
     (void) file; // suppress unused warning.
 
-    // TODO: These should probably be from the input file.
-    long count = 100;
-    float* data = malloc(1024);
+    long* sizePointer = mmap(0, sizeof(long), PROT_READ, MAP_PRIVATE | MAP_FILE , fd, 0);
+    long size = sizePointer[0];
+    float* arr = mmap(0, size*sizeof(float), PROT_READ | PROT_WRITE , MAP_SHARED , fd, 0);
+    arr = &arr[2]; // offset for array on mmap
 
-    printf("...", count);
-    printf("...", data[0]);
+    // TODO: These should probably be from the input file.
+    // long count = 100;
+    // float* data = malloc(1024);
+
+    printf("...", size);
+    printf("...", arr[0]);
 
     long sizes_bytes = P * sizeof(long);
     long* sizes = malloc(sizes_bytes); // TODO: This should be shared
 
     barrier* bb = make_barrier(P);
 
-    sample_sort(data, count, P, sizes, bb);
+    sample_sort(arr, size, P, sizes, bb);
 
     free_barrier(bb);
 
     // TODO: munmap your mmaps
+    munmap(arr, size*sizeof(float));
+    munmap(sizePointer, sizeof(long));
 
     return 0;
 }
