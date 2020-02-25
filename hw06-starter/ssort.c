@@ -50,7 +50,7 @@ sample(float* data, long size, int P)
     }
     //push infinity end val
     floats_push(float_arr, FLT_MAX);
-
+    floats_print(float_arr);
     free_floats(samples_arr);
 
     // floats_print(float_arr);
