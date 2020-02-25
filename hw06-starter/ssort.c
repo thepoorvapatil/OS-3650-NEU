@@ -15,7 +15,7 @@
 
 int compare (const void * a, const void * b)
 {
-    return ( (int) ((*(const float*)a > *(const float*)b) - (*(const float*)b < *(const float*)b)));
+    return ( ((*(const float*)a > *(const float*)b) - (*(const float*)b < *(const float*)b)));
 }
 
 void
@@ -50,7 +50,7 @@ sample(float* data, long size, int P)
     }
     //push infinity end val
     floats_push(float_arr, FLT_MAX);
-    floats_print(float_arr);
+    // floats_print(float_arr);
 
     free_floats(samples_arr);
 
@@ -172,9 +172,6 @@ main(int argc, char* argv[])
     int fd = open(fname, O_RDWR);
     check_rv(fd);
 
-    void* file = malloc(1024); // TODO: load the file with mmap.
-    (void) file; // suppress unused warning.
-
     long* sizePointer = mmap(0, sizeof(long), PROT_READ, MAP_PRIVATE | MAP_FILE , fd, 0);
     long size = sizePointer[0];
     float* arr = mmap(0, size*sizeof(float), PROT_READ | PROT_WRITE , MAP_SHARED , fd, 0);
@@ -197,6 +194,7 @@ main(int argc, char* argv[])
     free_barrier(bb);
 
     // TODO: munmap your mmaps
+    munmap(sizes,sizes_bytes);
     munmap(arr, size*sizeof(float));
     munmap(sizePointer, sizeof(long));
 
