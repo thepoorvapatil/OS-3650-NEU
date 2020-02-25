@@ -7,42 +7,45 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <math.h>
-#include <float.h>
 
 #include "float_vec.h"
 #include "barrier.h"
 #include "utils.h"
+#include <float.h>
+
+int
+comparitive(const void*a, const void*b)
+{
+  float fa = (const float) a;
+  float fb = (const float) b;
+  return (fa > fb) - (fa < fb);
+}
 
 void
 qsort_floats(floats* xs)
 {
-    qsort(xs->data, xs->size, sizeof(float), compare);
-    int compare (const void * aa, const void * bb)
-    {
-        float ffa = *(const float*) aa;
-        float ffb = *(const float*) bb;
-        return (ffa > ffb) - (ffa < ffb);
-    }
+    // TODO: call qsort to sort the array
+    // see "man 3 qsort" for details
+    qsort(xs->data, xs->size, sizeof(float), comparitive);
 }
 
 floats*
 sample(float* data, long size, int P)
 {
     // TODO: sample the input data, per the algorithm decription
-    floats* ana = make_floats(0);
-    floats_push(ana, FLT_MIN);
-    float array [3*(P-1)];
-    for (int ii = 0; ii < 3*(P-1); ii++){
-        array[ii] = data[rand()% size];
+    floats* make = make_floats(1);
+    sample_size = 3*(P-1);
+    float prearray[sample_size];
+    for (i=0;i<sample_size;i++){
+        prearray[i] = data[rand()%sample_size];
     }
-    array = qsort(array->data, 3*(P-1), sizeof(float), compare);
-
-    for (int ii = 1; ii < 3*(P-1); ii++){
-        floats_push(ana,array[ii]);
+    prearray = qsort(prearray->data, sample_size, sizeof(float), comparitive);
+    for (j=1;j<sample_size;j+=3){
+        floats_push(make, j)
     }
-    floats_push(ana, FLT_MAX);
-    floats_print(ana);
+    floats_push(make, FLT_MAX);
     return make_floats(10);
+    floats_print(make);
 }
 
 void
@@ -114,17 +117,17 @@ main(int argc, char* argv[])
     int fd = open(fname, O_RDWR);
     check_rv(fd);
 
-    void* file = malloc(1024); 
-    long* aa = mmap(0, sizeof(long), PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FILE, fd, 0);
-    long size = aa[0];
-    float* ss = mmap(0, size*sizeof(float), PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
-    ss = &b[2];
+    void* file = malloc(1024); // TODO: load the file with mmap.
+    long* xl = mmap(0, sizeof(long), PROT_READ, MAP_PRIVATE|MAP_FILE, fd, 0);
+    longsize = xl[0];
+    float* xf = mmap(0, longsize*sizeof(float), PROT_READ|PROT_WRITE, MAP_SHARED|MAP_FILE, fd, 0);
+    xf = &xf[2];
 
     (void) file; // suppress unused warning.
 
     // TODO: These should probably be from the input file.
-    long count = 100;
-    float* data = malloc(1024);
+    // long count = 100;
+    // float* data = malloc(1024);
 
     printf("...", count);
     printf("...", data[0]);
@@ -134,12 +137,12 @@ main(int argc, char* argv[])
 
     barrier* bb = make_barrier(P);
 
-    sample_sort(ss, size, P, sizes, bb);
+    sample_sort(xf, xl, P, sizes, bb);
 
     free_barrier(bb);
-    munmap(aa, sizeof(long));
-    munmap(bb, size*sizeof(float));
-    
 
+    // TODO: munmap your mmaps
+    munmap(xl,sizeof(long));
+    munmap(xf,longsize*sizeof(float));
     return 0;
 }
