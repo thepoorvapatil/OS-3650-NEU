@@ -185,7 +185,7 @@ main(int argc, char* argv[])
     // printf("...", arr[0]);
 
     long sizes_bytes = P * sizeof(long);
-    long* sizes = malloc(sizes_bytes); // TODO: This should be shared
+    long* sizes = mmap(0, sizes_bytes, PROT_READ | PROT_WRITE, MAP_SHARED| MAP_ANONYMOUS, -1, 0); // TODO: This should be shared
 
     barrier* bb = make_barrier(P);
 
