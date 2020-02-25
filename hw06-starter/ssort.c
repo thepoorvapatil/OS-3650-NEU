@@ -137,8 +137,8 @@ main(int argc, char* argv[])
     // long count = 100;
     // float* data = malloc(1024);
 
-    printf("...", size);
-    printf("...", arr[0]);
+    // printf("...", size);
+    // printf("...", arr[0]);
 
     long sizes_bytes = P * sizeof(long);
     long* sizes = malloc(sizes_bytes); // TODO: This should be shared
