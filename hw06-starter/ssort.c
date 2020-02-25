@@ -51,6 +51,7 @@ sample(float* data, long size, int P)
     //push infinity end val
     floats_push(float_arr, FLT_MAX);
     floats_print(float_arr);
+
     free_floats(samples_arr);
 
     // floats_print(float_arr);
@@ -84,7 +85,7 @@ sort_worker(int pnum, float* data, long size, int P, floats* samps, long* sizes,
     }
     // end = sum(sizes[0 to p]) # that’s sum(1 item) for p = 0
     long end=0;
-    for(int ii=0; ii<pnum+1; ii++){
+    for(int ii=0; ii<=pnum; ii++){
         end+=sizes[ii];
     }
 
