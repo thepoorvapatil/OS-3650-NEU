@@ -172,7 +172,7 @@ main(int argc, char* argv[])
     check_rv(fd);
 
     void* file = malloc(1024); // TODO: load the file with mmap.
-    // (void) file; // suppress unused warning.
+    (void) file; // suppress unused warning.
 
     long* sizePointer = mmap(0, sizeof(long), PROT_READ, MAP_PRIVATE | MAP_FILE , fd, 0);
     long size = sizePointer[0];
