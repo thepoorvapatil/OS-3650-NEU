@@ -96,17 +96,17 @@ sample(float* data, long size, int P)
 
     // TODO: sample the input data, per the algorithm decription
     // 
-    floats* float_arr = make_floats(3 * (P - 1));
-
+    floats* float_arr = make_floats(0);
+    floats_push(float_arr, FLT_MIN);
     //stores samples
-    floats* samples_arr = make_floats(P + 1);
+    floats* samples_arr = make_floats(0);
 
     //push all float_arr in one floats struct array
-    for(int ii = 0; ii < float_arr->cap; ii++){
+    for(int ii = 0; ii < 3*(P-1); ii++){
         // samp_arr[ii] = data[rand()%size];
-        floats_push(float_arr, data[rand() % size]);
+        floats_push(samples_arr, data[rand() % size]);
     }
-    qsort_floats(float_arr);
+    qsort_floats(samples_arr);
     
     floats_push(samples_arr, 0);
     int median = 1;
