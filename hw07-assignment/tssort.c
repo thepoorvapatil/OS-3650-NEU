@@ -766,7 +766,7 @@ sample(float* data, long size, int P)
 // }
 
 
-free_floats(sample_arr);
+free_floats(samples_arr);
 
 // 4 - Adding maximun value at the end.
 floats_push(samples_arr, FLT_MAX);
