@@ -25,7 +25,7 @@ typedef struct job {
 
 
 float*
-    readinput(int fd, long count){
+Read(int fd, long count){
     float* data = malloc(4 * count);
 
     for(int ii = 0; ii < count; ++ii)
@@ -35,7 +35,7 @@ float*
 }
 
 void
-writeoutput(const char* file, long count, float* data){
+Write(const char* file, long count, float* data){
 
     int fd = open(file, O_CREAT | O_WRONLY | O_TRUNC, 0644);
     check_rv(fd);
@@ -50,22 +50,22 @@ writeoutput(const char* file, long count, float* data){
 
 
 long 
-sumsizes_start(long* sizes, int pp){
-//Summing sizes to calculate the start index on the file to copy the sorted data. 
-if(pp == 0) return 0;
+start_sumsizes(long* sizes, int pp){
+    if(pp == 0) 
+        return 0;
 
-long result = 0;
-for (int cc = 0; cc <= pp - 1; ++cc) {
-	result += sizes[cc];
-}
+    long result = 0;
+    for (int cc = 0; cc <= pp - 1; cc++) {
+	    result += sizes[cc];
+    }
 
-return result;
+    return result;
 }
 
 
 
 long
-sumsizes_end(long* sizes, int pp){
+end_sumsizes(long* sizes, int pp){
     //Summing sizes to calculate the end index ont he file to copy the sorted data. 
     long result = 0;
     for(int cc = 0; cc <= pp; ++cc)
@@ -136,47 +136,44 @@ sample(float* data, long size, int P)
 void*
 sort_worker(void *args) {
 
-    //NOTE: maybe create a wrapper function to make it easier to work with input arguments. 
-
     job* arg = ((job*)args);
 
     floats* xs = make_floats(arg->size / arg->P);
 
 
-    //Selecting fooats to be sorted by this worker. 
+    // TODO: select the floats to be sorted by this worker
     float start = arg->samps->data[arg->pnum];
     float end = arg->samps->data[arg->pnum + 1];
 
-    for(int ii = 0; ii < arg->size; ++ii){
+    for(int ii = 0; ii < arg->size; ii++){
         if (arg->data[ii] >= start && arg->data[ii] < end){
 	        floats_push(xs, arg->data[ii]);
         }
     }   
 
-    //Writting the number of items taken to a shared array of sizes at slot p.
+    
+    printf("%d: start %.04f, count %ld\n", arg->pnum, arg->samps->data[arg->pnum], arg->sizes[arg->pnum]);
+
+
     arg->sizes[arg->pnum] = xs->size;
-
-        printf("%d: start %.04f, count %ld\n", arg->pnum, arg->samps->data[arg->pnum], arg->sizes[arg->pnum]);
-
-    //Sort locally.
     qsort_floats(xs);
 
-    //SYNCRONIZING
+    //Synchronizing
     barrier_wait(arg->bb);
 
     //Copy local array to input.
-    long start_idx = sumsizes_start(arg->sizes, arg->pnum);
-    long end_idx = sumsizes_end(arg->sizes, arg->pnum); 
+    // long Start = sumsizes_start(arg->sizes, arg->pnum);
+    // long End = sumsizes_end(arg->sizes, arg->pnum); 
 
     //Each process copies its sorted array to input[start...end].
-    long idx = start_idx;
+    long index = start_sumsizes(arg->sizes, arg->pnum);
     long kk = 0; 
-    while (idx < end_idx){
+    while (index < end_sumsizes(arg->sizes, arg->pnum)){
         //Copying sorted element to file. 
-        arg->data[idx] = xs->data[kk];
+        arg->data[index] = xs->data[kk];
         //Incrementing counters.
         kk++;			
-        idx++;
+        index++;
     }
 
     free_floats(xs);
@@ -194,8 +191,9 @@ run_sort_workers(float* data, long size, int P, floats* samps, long* sizes, barr
 {
     pthread_t threads[P];
 
+    int rv;
 
-    // Spawn P processes, each running sort_worker
+    // Spawn P processes
 	for(int pp = 0; pp < P; ++pp){
 		job* args = malloc(sizeof(job));
 		args->pnum = pp;
@@ -206,12 +204,12 @@ run_sort_workers(float* data, long size, int P, floats* samps, long* sizes, barr
 		args->sizes = sizes;
 		args->bb = bb;
 
-		int rv = pthread_create(&(threads[pp]), 0,  sort_worker, args);
+		rv = pthread_create(&(threads[pp]), 0,  sort_worker, args);
 		assert (rv == 0);
     }
 
 	for(int ii = 0; ii < P; ++ii){
-		int rv = pthread_join(threads[ii], 0);
+		rv = pthread_join(threads[ii], 0);
 		assert (rv == 0);
     }
 }
@@ -237,11 +235,8 @@ main(int argc, char* argv[])
         return 1;
     }
 	
-    //First argument.
     const int P = atoi(argv[1]); 
-    //Second argument. 
     const char* fname = argv[2];
-    //Third argument.
     const char* output = argv[3];
 
     seed_rng();
@@ -257,34 +252,25 @@ main(int argc, char* argv[])
         return 1;
     }
 	
-    //Open the input file.
     int fd = open(fname, O_RDWR);
     check_rv(fd);
 
-
-    //Reading from input file 
     long count;
     read(fd, &count, 8);
-    float* data = readinput(fd, count);
+    float* data = Read(fd, count);
 
-    //Sizes for chunk of array in sample sort. 
     long sizes_bytes = P * sizeof(long);
     long* sizes = malloc(sizes_bytes);
     
     barrier* bb = make_barrier(P);
-
-    //Sorting the data
     sample_sort(data, count, P, sizes, bb);
 
-    //Writting in output file.
-    writeoutput(output, count, data);
+    Write(output, count, data);
 
-    //Freeing. 
     free_barrier(bb);
     free(data);
     free(sizes);
 
-    //Closing file descriptor.
     close(fd);
 
     return 0;
