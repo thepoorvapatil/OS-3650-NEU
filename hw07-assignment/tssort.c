@@ -849,7 +849,7 @@ main(int argc, char* argv[])
 {
     alarm(120);
 
-    if (argc != 3) {
+    if (argc != 4) {
         printf("Usage:\n");
         printf("\t%s P data.dat\n", argv[0]);
         return 1;
