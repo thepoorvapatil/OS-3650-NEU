@@ -676,28 +676,32 @@ for(int cc = 0; cc <= pp; ++cc){
 return result;
 }
 
-int
-comparator(const void* p1, const void* p2){
+// int
+// comparator(const void* p1, const void* p2){
 
-//Comparator implemented for qsort function. 
-float f1 = *(const float *)p1;
-float f2 = *(const float *)p2;
+// //Comparator implemented for qsort function. 
+// float f1 = *(const float *)p1;
+// float f2 = *(const float *)p2;
 
-if(f1 < f2){
-	return -1;
-} else if (f1 == f2){
-	return 0;
-} else {
-	return 1;
+// if(f1 < f2){
+// 	return -1;
+// } else if (f1 == f2){
+// 	return 0;
+// } else {
+// 	return 1;
+// }
+// }
+
+int compare (const void * a, const void * b)
+{
+    return ( ((*(const float*)a > *(const float*)b) - (*(const float*)b < *(const float*)b)));
 }
-}
-
 
 void
 qsort_floats(floats* xs)
 {
 // Call qsort to sort the array.
-qsort(xs->data, xs->size, 4, comparator);
+qsort(xs->data, xs->size, 4, compare);
 }
 
 
@@ -715,8 +719,6 @@ float chosen = data[rand() % size];
 floats_push(sample_items, chosen);
 }
 
-// //debug
-// floats_print(sample_items);
 // 2 - Sort chosen items.
 qsort_floats(sample_items);
 //floats_print(sample_items);
