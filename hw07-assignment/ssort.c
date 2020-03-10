@@ -1,102 +1,102 @@
-// #include <stdio.h>
-// #include <stdlib.h>
-// #include <sys/mman.h>
-// #include <sys/types.h>
-// #include <sys/stat.h>
-// #include <sys/wait.h>
-// #include <unistd.h>
-// #include <fcntl.h>
-// #include <math.h>
-// #include <float.h>
-// #include <assert.h>
-// #include "float_vec.h"
-// #include "barrier.h"
-// #include "utils.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/mman.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <math.h>
+#include <float.h>
+#include <assert.h>
+#include "float_vec.h"
+#include "barrier.h"
+#include "utils.h"
 
-// typedef struct job {
-//     int pnum;
-//     float* data;
-//     long size;
-//     int P;
-//     floats* samps;
-//     long* sizes;
-//     barrier* bb;
-// } job;
+typedef struct job {
+    int pnum;
+    float* data;
+    long size;
+    int P;
+    floats* samps;
+    long* sizes;
+    barrier* bb;
+} job;
 
 
-// float*
-// Read(int fd, long count){
-//     float* data = malloc(4 * count);
+float*
+readinput(int fd, long count){
+    float* data = malloc(4 * count);
 
-//     for(int ii = 0; ii < count; ++ii)
-// 	    read(fd, &data[ii], 4);
+    for(int ii = 0; ii < count; ++ii)
+	    read(fd, &data[ii], 4);
     
-//     return data;
-// }
+    return data;
+}
 
-// void
-// Write(const char* file, long count, float* data){
+void
+writeinput(const char* file, long count, float* data){
 
-//     int fd = open(file, O_CREAT | O_WRONLY | O_TRUNC, 0644);
-//     check_rv(fd);
+    int fd = open(file, O_CREAT | O_WRONLY | O_TRUNC, 0644);
+    check_rv(fd);
 
-//     write(fd, &count, 8);
-//     for(int ii = 0; ii < count; ++ii)
-// 	    write(fd, &data[ii], 4);
+    write(fd, &count, 8);
+    for(int ii = 0; ii < count; ++ii)
+	    write(fd, &data[ii], 4);
     
-//     close(fd);
-// }
+    close(fd);
+}
 
 
 
-// long 
-// start_sumsizes(long* sizes, int pp){
-//     if(pp == 0) 
-//         return 0;
+long 
+sumsizes_start(long* sizes, int pp){
+    if(pp == 0) 
+        return 0;
 
-//     long result = 0;
-//     for (int cc = 0; cc <= pp - 1; cc++) {
-// 	    result += sizes[cc];
-//     }
+    long result = 0;
+    for (int cc = 0; cc <= pp - 1; cc++) {
+	    result += sizes[cc];
+    }
 
-//     return result;
-// }
+    return result;
+}
 
 
 
-// long
-// end_sumsizes(long* sizes, int pp){
-//     //Summing sizes to calculate the end index ont he file to copy the sorted data. 
-//     long result = 0;
-//     for(int cc = 0; cc <= pp; ++cc)
-// 	    result += sizes[cc];
+long
+sumsizes_end(long* sizes, int pp){
+    //Summing sizes to calculate the end index ont he file to copy the sorted data. 
+    long result = 0;
+    for(int cc = 0; cc <= pp; ++cc)
+	    result += sizes[cc];
 
-//     return result;
-// }
+    return result;
+}
 
-// //done
-// int
-// compare(const void* p1, const void* p2){
+//done
+int
+compare(const void* p1, const void* p2){
 
-//     float f1 = *(const float *)p1;
-//     float f2 = *(const float *)p2;
+    float f1 = *(const float *)p1;
+    float f2 = *(const float *)p2;
 
-//     if(f1 < f2)
-// 	    return -1;
-//     else if (f1 == f2)
-// 	    return 0;
-//     else 
-// 	    return 1;
-// }
+    if(f1 < f2)
+	    return -1;
+    else if (f1 == f2)
+	    return 0;
+    else 
+	    return 1;
+}
 
-// //done
-// void
-// qsort_floats(floats* xs)
-// {
-//     // TODO: call qsort to sort the array
-//     // see "man 3 qsort" for details
-//     qsort(xs->data, xs->size, 4, compare);
-// }
+//done
+void
+qsort_floats(floats* xs)
+{
+    // TODO: call qsort to sort the array
+    // see "man 3 qsort" for details
+    qsort(xs->data, xs->size, 4, compare);
+}
 
 // floats*
 // sample(float* data, long size, int P)
@@ -276,111 +276,111 @@
 //     return 0;
 // }
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/mman.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/wait.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <math.h>
-#include <float.h>
-#include <assert.h>
-#include "float_vec.h"
-#include "barrier.h"
-#include "utils.h"
+// #include <stdio.h>
+// #include <stdlib.h>
+// #include <sys/mman.h>
+// #include <sys/types.h>
+// #include <sys/stat.h>
+// #include <sys/wait.h>
+// #include <unistd.h>
+// #include <fcntl.h>
+// #include <math.h>
+// #include <float.h>
+// #include <assert.h>
+// #include "float_vec.h"
+// #include "barrier.h"
+// #include "utils.h"
 
-typedef struct job {
-int pnum;
-float* data;
-long size;
-int P;
-floats* samps;
-long* sizes;
-barrier* bb;
-} job;
-
-
-float*
-readinput(int fd, long count){
-float* data = malloc(4 * count);
-
-for(int ii = 0; ii < count; ++ii){
-	read(fd, &data[ii], 4);
-}
-
-return data;
-
-}
+// typedef struct job {
+// int pnum;
+// float* data;
+// long size;
+// int P;
+// floats* samps;
+// long* sizes;
+// barrier* bb;
+// } job;
 
 
+// float*
+// readinput(int fd, long count){
+// float* data = malloc(4 * count);
 
-void
-writeoutput(const char* file, long count, float* data){
+// for(int ii = 0; ii < count; ++ii){
+// 	read(fd, &data[ii], 4);
+// }
 
-int fd = open(file, O_CREAT | O_WRONLY | O_TRUNC, 0644);
-check_rv(fd);
+// return data;
 
-write(fd, &count, 8);
-for(int ii = 0; ii < count; ++ii){
-	write(fd, &data[ii], 4);
-}
-
-close(fd);
-}
+// }
 
 
 
-long 
-sumsizes_start(long* sizes, int pp){
-//Summing sizes to calculate the start index on the file to copy the sorted data. 
-if(pp == 0) return 0;
+// void
+// writeoutput(const char* file, long count, float* data){
 
-long result = 0;
-for (int cc = 0; cc <= pp - 1; ++cc) {
-	result += sizes[cc];
-}
+// int fd = open(file, O_CREAT | O_WRONLY | O_TRUNC, 0644);
+// check_rv(fd);
 
-return result;
-}
+// write(fd, &count, 8);
+// for(int ii = 0; ii < count; ++ii){
+// 	write(fd, &data[ii], 4);
+// }
 
-
-
-long
-sumsizes_end(long* sizes, int pp){
-//Summing sizes to calculate the end index ont he file to copy the sorted data. 
-long result = 0;
-for(int cc = 0; cc <= pp; ++cc){
-	result += sizes[cc];
-}
-
-return result;
-}
-
-int
-comparator(const void* p1, const void* p2){
-
-//Comparator implemented for qsort function. 
-float f1 = *(const float *)p1;
-float f2 = *(const float *)p2;
-
-if(f1 < f2){
-	return -1;
-} else if (f1 == f2){
-	return 0;
-} else {
-	return 1;
-}
-}
+// close(fd);
+// }
 
 
-void
-qsort_floats(floats* xs)
-{
-// Call qsort to sort the array.
-qsort(xs->data, xs->size, 4, comparator);
-}
+
+// long 
+// sumsizes_start(long* sizes, int pp){
+// //Summing sizes to calculate the start index on the file to copy the sorted data. 
+// if(pp == 0) return 0;
+
+// long result = 0;
+// for (int cc = 0; cc <= pp - 1; ++cc) {
+// 	result += sizes[cc];
+// }
+
+// return result;
+// }
+
+
+
+// long
+// sumsizes_end(long* sizes, int pp){
+// //Summing sizes to calculate the end index ont he file to copy the sorted data. 
+// long result = 0;
+// for(int cc = 0; cc <= pp; ++cc){
+// 	result += sizes[cc];
+// }
+
+// return result;
+// }
+
+// int
+// comparator(const void* p1, const void* p2){
+
+// //Comparator implemented for qsort function. 
+// float f1 = *(const float *)p1;
+// float f2 = *(const float *)p2;
+
+// if(f1 < f2){
+// 	return -1;
+// } else if (f1 == f2){
+// 	return 0;
+// } else {
+// 	return 1;
+// }
+// }
+
+
+// void
+// qsort_floats(floats* xs)
+// {
+// // Call qsort to sort the array.
+// qsort(xs->data, xs->size, 4, comparator);
+// }
 
 
 
