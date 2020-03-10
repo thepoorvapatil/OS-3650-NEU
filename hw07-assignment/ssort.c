@@ -35,7 +35,7 @@ readinput(int fd, long count){
 }
 
 void
-writeinput(const char* file, long count, float* data){
+writeoutput(const char* file, long count, float* data){
 
     int fd = open(file, O_CREAT | O_WRONLY | O_TRUNC, 0644);
     check_rv(fd);
