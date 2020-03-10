@@ -75,11 +75,11 @@ end_sumsizes(long* sizes, int pp){
 }
 
 //done
-int 
-compare (const void * a, const void * b)
-{
-    return ( ((*(const float*)a > *(const float*)b) - (*(const float*)b < *(const float*)b)));
-}
+// int 
+// compare (const void * a, const void * b)
+// {
+//     return ( ((*(const float*)a > *(const float*)b) - (*(const float*)b < *(const float*)b)));
+// }
 
 int
 compare(const void* p1, const void* p2){
