@@ -8,6 +8,8 @@
 
 typedef struct barrier {
     // TODO: Need some synchronization stuff.
+    pthread_mutex_t mutex;
+    pthread_cond_t cv;
     int   count;
     int   seen;
 } barrier;
