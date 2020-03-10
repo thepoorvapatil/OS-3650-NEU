@@ -50,7 +50,7 @@ writeoutput(const char* file, long count, float* data){
 
 
 long 
-sumsizes_start(long* sizes, int pp){
+start_sumsizes(long* sizes, int pp){
     if(pp == 0) 
         return 0;
 
@@ -65,7 +65,7 @@ sumsizes_start(long* sizes, int pp){
 
 
 long
-sumsizes_end(long* sizes, int pp){
+end_sumsizes(long* sizes, int pp){
     //Summing sizes to calculate the end index ont he file to copy the sorted data. 
     long result = 0;
     for(int cc = 0; cc <= pp; ++cc)
