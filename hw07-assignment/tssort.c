@@ -847,7 +847,7 @@ sample_sort(float* data, long size, int P, long* sizes, barrier* bb)
 int
 main(int argc, char* argv[])
 {
-    alarm(120);
+    alarm(95);
 
     if (argc != 4) {
         printf("Usage:\n");
@@ -887,7 +887,10 @@ main(int argc, char* argv[])
 
     //Sizes for chunk of array in sample sort. 
     long sizes_bytes = P * sizeof(long);
-    long* sizes = mmap(0, sizes_bytes, PROT_READ | PROT_WRITE, MAP_SHARED| MAP_ANONYMOUS, -1, 0);
+    long* sizes = mmap(0, sizes_bytes, PROT_READ | PROT_WRITE, MAP_SHARED| MAP_ANONYMOUS, -1, 0); // TODO: This should be shared
+
+    // long* sizes = malloc(sizes_bytes);
+
     
     barrier* bb = make_barrier(P);
 
