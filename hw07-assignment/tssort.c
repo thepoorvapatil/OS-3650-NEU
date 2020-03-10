@@ -766,14 +766,14 @@ sample(float* data, long size, int P)
 // }
 
 
-free_floats(samples_arr);
+// free_floats(sample_items);
 
-// 4 - Adding maximun value at the end.
-floats_push(samples_arr, FLT_MAX);
+// // 4 - Adding maximun value at the end.
+// floats_push(samps, FLT_MAX);
 
 
-return samples_arr;
-}
+// return samps;
+// }
 
 
 
