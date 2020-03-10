@@ -705,34 +705,65 @@ qsort(xs->data, xs->size, 4, compare);
 }
 
 
-
-
 floats*
 sample(float* data, long size, int P)
 {
 
-// 1- Randomly select 3*(P-1) items from the array.
-floats* sample_items = make_floats(3 * (P - 1));
+    // TODO: sample the input data, per the algorithm decription
+    // 
+    floats* float_arr = make_floats(0);
+    floats_push(float_arr, FLT_MIN);
+    //stores samples
+    floats* samples_arr = make_floats(0);
 
-for(int ii = 0; ii < sample_items->cap; ++ii){
-float chosen = data[rand() % size];
-floats_push(sample_items, chosen);
+    //push all float_arr in one floats struct array
+    for(int ii = 0; ii < 3*(P-1); ii++){
+        // samp_arr[ii] = data[rand()%size];
+        floats_push(samples_arr, data[rand() % size]);
+    }
+    qsort_floats(samples_arr);
+    
+    floats_push(samples_arr, 0);
+    int median = 1;
+    for(int ii = 0; ii < P-1; ++ii){
+        floats_push(samples_arr, float_arr->data[median]);
+        median += 3;
+    }
+
+    free_floats(float_arr);
+
+    floats_push(samples_arr, FLT_MAX);
+
+    return samples_arr;
 }
 
-// 2 - Sort chosen items.
-qsort_floats(sample_items);
-//floats_print(sample_items);
+
+// floats*
+// sample(float* data, long size, int P)
+// {
+
+// // 1- Randomly select 3*(P-1) items from the array.
+// floats* sample_items = make_floats(3 * (P - 1));
+
+// for(int ii = 0; ii < sample_items->cap; ++ii){
+// float chosen = data[rand() % size];
+// floats_push(sample_items, chosen);
+// }
+
+// // 2 - Sort chosen items.
+// qsort_floats(sample_items);
+// //floats_print(sample_items);
 
 
-// 3 - Take the median of each group of 3 in the sorted sample_items producing our array of floats samps. 
-floats* samps = make_floats(P + 1);
-// 4 - Adding 0 at start.
-floats_push(samps, 0);
-int median = 1;
-for(int ii = 0; ii < P-1; ++ii){
-    floats_push(samps, sample_items->data[median]);
-    median += 3;
-}
+// // 3 - Take the median of each group of 3 in the sorted sample_items producing our array of floats samps. 
+// floats* samps = make_floats(P + 1);
+// // 4 - Adding 0 at start.
+// floats_push(samps, 0);
+// int median = 1;
+// for(int ii = 0; ii < P-1; ++ii){
+//     floats_push(samps, sample_items->data[median]);
+//     median += 3;
+// }
 
 
 free_floats(sample_items);
