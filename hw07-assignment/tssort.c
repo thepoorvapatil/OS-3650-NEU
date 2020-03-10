@@ -715,8 +715,8 @@ float chosen = data[rand() % size];
 floats_push(sample_items, chosen);
 }
 
-//debug
-floats_print(sample_items);
+// //debug
+// floats_print(sample_items);
 // 2 - Sort chosen items.
 qsort_floats(sample_items);
 //floats_print(sample_items);
