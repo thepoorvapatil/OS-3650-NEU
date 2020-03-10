@@ -249,7 +249,7 @@ main(int argc, char* argv[])
 
     long count;
     read(fd, &count, 8);
-    float* data = Read(fd, count);
+    float* data = readinput(fd, count);
 
     long sizes_bytes = P * sizeof(long);
     long* sizes = malloc(sizes_bytes);
@@ -257,7 +257,7 @@ main(int argc, char* argv[])
     barrier* bb = make_barrier(P);
     sample_sort(data, count, P, sizes, bb);
 
-    Write(output, count, data);
+    writeoutput(output, count, data);
 
     free_barrier(bb);
     free(data);
