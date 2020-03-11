@@ -127,20 +127,20 @@ printf("%d: start %.04f, count %ld\n", val->pnum, val->samps->data[val->pnum], v
 
 qsort_floats(xs);
 
-barrier_wait(arg->bb);
+barrier_wait(val->bb);
 
-long index = start_sum(arg->sizes, arg->pnum);
+long index = start_sum(val->sizes, val->pnum);
 long counter = 0; 
 
-while (index < end_sum(arg->sizes, arg->pnum)){
-    arg->data[index] = xs->data[counter];
+while (index < end_sum(val->sizes, val->pnum)){
+    val->data[index] = xs->data[counter];
     counter++;			
     index++;
 }
 
 free_floats(xs);
 
-free(arg);
+free(val);
 
 return 0;
 }
