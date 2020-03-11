@@ -52,7 +52,6 @@ start_sum(long* sizes, int pp){
 
 long
 end_sum(long* sizes, int pp){
-    //Summing sizes to calculate the end index ont he file to copy the sorted data. 
     long result = 0;
     for(int cc = 0; cc <= pp; ++cc){
         result += sizes[cc];
@@ -92,7 +91,6 @@ sample(float* data, long size, int P)
     int median = 1;
     for(int ii = 0; ii < P-1; ++ii, median+=3){
         floats_push(sample_arr, float_arr->data[median]);
-        // median += 3;
     }
 
     free_floats(float_arr);
@@ -111,10 +109,6 @@ sort_worker(void *vals) {
 job* val = ((job*)vals);
 
 floats* xs = make_floats(val->size / val->P);
-
-
-// float start = arg->samps->data[arg->pnum];
-// float end = arg->samps->data[arg->pnum + 1];
 
 for(int ii = 0; ii < val->size; ++ii){
     if (val->data[ii] >= val->samps->data[val->pnum] && val->data[ii] < val->samps->data[val->pnum + 1]){
@@ -245,7 +239,6 @@ main(int argc, char* argv[])
     munmap(sizes,sizes_bytes);
     munmap(arr, size*sizeof(float));
     munmap(sizePointer, sizeof(long));
-
 
     return 0;
 }
