@@ -759,19 +759,19 @@ return 0;
 void
 run_sort_workers(float* data, long size, int P, floats* samps, long* sizes, barrier* bb)
 {
-pthread_t threads[P];
+    pthread_t threads[P];
 
-
-// Spawn P processes, each running sort_worker
-	for(int ii = 0; ii < P; ii++){
+    // TODO: spawn P processes, each running sort_worker
+	for(int pp = 0; pp < P; pp++){
 		job* args = malloc(sizeof(job));
-		args->pnum = ii;
+		args->pnum = pp;
 		args->data = data;
 		args->size = size;
 		args->P = P;
 		args->samps = samps;
 		args->sizes = sizes;
 		args->bb = bb;
+
 		int rv = pthread_create(&(threads[ii]), 0,  sort_worker, args);
 		assert (rv == 0);
     }
@@ -821,25 +821,35 @@ main(int argc, char* argv[])
     check_rv(fd);
 
 
-    long count;
-    read(fd, &count, 8);
-    float* data = readinput(fd, count);
+    // long count;
+    // read(fd, &count, 8);
+    // float* data = readinput(fd, count);
+
+    long* sizePointer = mmap(0, sizeof(long), PROT_READ, MAP_PRIVATE | MAP_FILE , fd, 0);
+    long size = sizePointer[0];
+    float* arr = mmap(0, size*sizeof(float), PROT_READ | PROT_WRITE , MAP_SHARED , fd, 0);
+    arr = &arr[2]; // offset for array on mmap
 
     long sizes_bytes = P * sizeof(long);
-    long* sizes = malloc(sizes_bytes);
+    // long* sizes = malloc(sizes_bytes);
+    long* sizes = mmap(0, sizes_bytes, PROT_READ | PROT_WRITE, MAP_SHARED| MAP_ANONYMOUS, -1, 0); // TODO: This should be shared
 
     
     barrier* bb = make_barrier(P);
 
-    sample_sort(data, count, P, sizes, bb);
+    sample_sort(arr, size, P, sizes, bb);
 
-    writeoutput(output, count, data);
+    // writeoutput(output, count, data);
 
     free_barrier(bb);
     free(data);
     free(sizes);
 
-    close(fd);
+    // close(fd);
+    munmap(sizes,sizes_bytes);
+    munmap(arr, size*sizeof(float));
+    munmap(sizePointer, sizeof(long));
+
 
     return 0;
 }
