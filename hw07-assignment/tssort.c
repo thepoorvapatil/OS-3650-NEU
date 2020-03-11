@@ -222,8 +222,22 @@ main(int argc, char* argv[])
 
     sample_sort(arr, size, P, sizes, bb);
 
-    writeoutput(opfile, size, arr);
+    // writeoutput(opfile, size, arr);
+    // int fd = open(file, O_CREAT | O_WRONLY | O_TRUNC, 0644);
+    // check_rv(fd);
 
+    // write(fd, &size, 8);
+    // for(int ii = 0; ii < size; ++ii){
+    //     write(fd, &arr[ii], 4);
+    // }
+    // close(fd);
+
+    //open file for output
+    int fdout = open(opfile, O_CREAT | O_WRONLY | O_TRUNC, 0644);
+
+    float* final = mmap (0, size*sizeof(float), PROT_READ | PROT_WRITE, MAP_SHARED, fdout, 0)
+
+    memcpy(final, arr, size*sizeof(float))
     free_barrier(bb);
     
     // TODO: munmap your mmaps
