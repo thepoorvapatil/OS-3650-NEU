@@ -9,6 +9,7 @@
 #include <math.h>
 #include <float.h>
 #include <assert.h>
+#include <string.h>
 #include "float_vec.h"
 #include "barrier.h"
 #include "utils.h"
