@@ -191,7 +191,7 @@ main(int argc, char* argv[])
 	
     const int P = atoi(argv[1]); 
     const char* fname = argv[2];
-    const char* output = argv[3];
+    const char* opfile = argv[3];
 
     seed_rng();
 
@@ -222,7 +222,7 @@ main(int argc, char* argv[])
 
     sample_sort(arr, size, P, sizes, bb);
 
-    writeoutput(output, size, arr);
+    writeoutput(opfile, size, arr);
 
     free_barrier(bb);
     
