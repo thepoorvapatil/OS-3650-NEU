@@ -772,7 +772,7 @@ run_sort_workers(float* data, long size, int P, floats* samps, long* sizes, barr
 		args->sizes = sizes;
 		args->bb = bb;
 
-		int rv = pthread_create(&(threads[ii]), 0,  sort_worker, args);
+		int rv = pthread_create(&(threads[pp]), 0,  sort_worker, args);
 		assert (rv == 0);
     }
 	for(int ii = 0; ii < P; ++ii){
@@ -839,11 +839,11 @@ main(int argc, char* argv[])
 
     sample_sort(arr, size, P, sizes, bb);
 
-    // writeoutput(output, count, data);
+    writeoutput(output, size, arr);
 
     free_barrier(bb);
-    free(data);
-    free(sizes);
+    // free(data);
+    // free(sizes);
 
     // close(fd);
     munmap(sizes,sizes_bytes);
