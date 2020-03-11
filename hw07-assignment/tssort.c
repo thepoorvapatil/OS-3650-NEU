@@ -170,8 +170,8 @@
 //     barrier_wait(arg->bb);
 
 //     //Copy local array to input.
-//     // long Start = sumsizes_start(arg->sizes, arg->pnum);
-//     // long End = sumsizes_end(arg->sizes, arg->pnum); 
+//     // long Start = start_sum(arg->sizes, arg->pnum);
+//     // long End = end_sum(arg->sizes, arg->pnum); 
 
 //     //Each process copies its sorted array to input[start...end].
 //     long index = start_sumsizes(arg->sizes, arg->pnum);
@@ -341,7 +341,7 @@
 
 
 // // long 
-// // sumsizes_start(long* sizes, int pp){
+// // start_sum(long* sizes, int pp){
 // // //Summing sizes to calculate the start index on the file to copy the sorted data. 
 // // if(pp == 0) return 0;
 
@@ -356,7 +356,7 @@
 
 
 // // long
-// // sumsizes_end(long* sizes, int pp){
+// // end_sum(long* sizes, int pp){
 // // //Summing sizes to calculate the end index ont he file to copy the sorted data. 
 // // long result = 0;
 // // for(int cc = 0; cc <= pp; ++cc){
@@ -465,8 +465,8 @@
 // // barrier_wait(arg->bb);
 
 // // //Copy local array to input.
-// // long start_idx = sumsizes_start(arg->sizes, arg->pnum);
-// // long end_idx = sumsizes_end(arg->sizes, arg->pnum); 
+// // long start_idx = start_sum(arg->sizes, arg->pnum);
+// // long end_idx = end_sum(arg->sizes, arg->pnum); 
 
 // // //Each process copies its sorted array to input[start...end].
 // // long idx = start_idx;
@@ -626,16 +626,12 @@ readinput(int fd, long count){
 
     for(int ii = 0; ii < count; ++ii)
         read(fd, &data[ii], 4);
-    
 
     return data;
-
 }
 
-
-
 void
-    writeoutput(const char* file, long count, float* data){
+writeoutput(const char* file, long count, float* data){
 
     int fd = open(file, O_CREAT | O_WRONLY | O_TRUNC, 0644);
     check_rv(fd);
@@ -644,28 +640,24 @@ void
     for(int ii = 0; ii < count; ++ii){
         write(fd, &data[ii], 4);
     }
-
     close(fd);
 }
 
-
-
 long 
-sumsizes_start(long* sizes, int pp){
-    if(pp == 0) return 0;
+start_sum(long* sizes, int pp){
+    if(pp == 0) 
+        return 0;
 
     long result = 0;
     for (int cc = 0; cc <= pp - 1; ++cc) {
         result += sizes[cc];
     }
-
     return result;
 }
 
 
-
 long
-sumsizes_end(long* sizes, int pp){
+end_sum(long* sizes, int pp){
     //Summing sizes to calculate the end index ont he file to copy the sorted data. 
     long result = 0;
     for(int cc = 0; cc <= pp; ++cc){
@@ -701,7 +693,6 @@ sample(float* data, long size, int P)
 
     qsort_floats(float_arr);
 
-
     floats* sample_arr = make_floats(P + 1);
     floats_push(sample_arr, 0);
     int median = 1;
@@ -710,12 +701,9 @@ sample(float* data, long size, int P)
         median += 3;
     }
 
-
     free_floats(float_arr);
 
-    // 4 - Adding maximun value at the end.
     floats_push(sample_arr, FLT_MAX);
-
 
     return sample_arr;
 }
@@ -726,47 +714,36 @@ sample(float* data, long size, int P)
 void*
 sort_worker(void *args) {
 
-//NOTE: maybe create a wrapper function to make it easier to work with input arguments. 
-
 job* arg = ((job*)args);
 
 floats* xs = make_floats(arg->size / arg->P);
 
 
-//Selecting fooats to be sorted by this worker. 
-float start = arg->sample_arr->data[arg->pnum];
-float end = arg->sample_arr->data[arg->pnum + 1];
+float start = arg->samps->data[arg->pnum];
+float end = arg->samps->data[arg->pnum + 1];
 
 for(int ii = 0; ii < arg->size; ++ii){
-if (arg->data[ii] >= start && arg->data[ii] < end){
-	floats_push(xs, arg->data[ii]);
-}
+    if (arg->data[ii] >= start && arg->data[ii] < end){
+        floats_push(xs, arg->data[ii]);
+    }
 }
 
-//Writting the number of items taken to a shared array of sizes at slot p.
 arg->sizes[arg->pnum] = xs->size;
 
-printf("%d: start %.04f, count %ld\n", arg->pnum, arg->sample_arr->data[arg->pnum], arg->sizes[arg->pnum]);
+printf("%d: start %.04f, count %ld\n", arg->pnum, arg->samps->data[arg->pnum], arg->sizes[arg->pnum]);
 
-//Sort locally.
 qsort_floats(xs);
 
-//SYNCRONIZING
 barrier_wait(arg->bb);
 
-//Copy local array to input.
-long start_idx = sumsizes_start(arg->sizes, arg->pnum);
-long end_idx = sumsizes_end(arg->sizes, arg->pnum); 
 
-//Each process copies its sorted array to input[start...end].
-long idx = start_idx;
-long kk = 0; 
-while (idx < end_idx){
-    //Copying sorted element to file. 
-    arg->data[idx] = xs->data[kk];
-    //Incrementing counters.
-    kk++;			
-    idx++;
+long index = start_sum(arg->sizes, arg->pnum);
+long counter = 0; 
+
+while (index < end_sum(arg->sizes, arg->pnum)){
+    arg->data[index] = xs->data[kk];
+    counter++;			
+    index++;
 }
 
 free_floats(xs);
@@ -780,37 +757,29 @@ return 0;
 
 
 void
-run_sort_workers(float* data, long size, int P, floats* sample_arr, long* sizes, barrier* bb)
+run_sort_workers(float* data, long size, int P, floats* samps, long* sizes, barrier* bb)
 {
 pthread_t threads[P];
 
 
 // Spawn P processes, each running sort_worker
-	for(int pp = 0; pp < P; ++pp){
+	for(int ii = 0; ii < P; ii++){
 		job* args = malloc(sizeof(job));
-		args->pnum = pp;
+		args->pnum = ii;
 		args->data = data;
 		args->size = size;
 		args->P = P;
-		args->sample_arr = sample_arr;
+		args->samps = sample_arr;
 		args->sizes = sizes;
 		args->bb = bb;
-
-		int rv = pthread_create(&(threads[pp]), 0,  sort_worker, args);
+		int rv = pthread_create(&(threads[ii]), 0,  sort_worker, args);
 		assert (rv == 0);
-
-
-}
-
-//free(args);
-
+    }
 	for(int ii = 0; ii < P; ++ii){
 		int rv = pthread_join(threads[ii], 0);
 		assert (rv == 0);
-    	}
+    }
 }
-
-
 
 void
 sample_sort(float* data, long size, int P, long* sizes, barrier* bb)
@@ -831,11 +800,8 @@ main(int argc, char* argv[])
         return 1;
     }
 	
-    //First argument.
     const int P = atoi(argv[1]); 
-    //Second argument. 
     const char* fname = argv[2];
-    //Third argument.
     const char* output = argv[3];
 
     seed_rng();
@@ -855,35 +821,25 @@ main(int argc, char* argv[])
     check_rv(fd);
 
 
-    //Reading from input file 
     long count;
     read(fd, &count, 8);
     float* data = readinput(fd, count);
 
-    //Sizes for chunk of array in sample sort. 
     long sizes_bytes = P * sizeof(long);
-    // long* sizes = mmap(0, sizes_bytes, PROT_READ | PROT_WRITE, MAP_SHARED| MAP_ANONYMOUS, -1, 0); // TODO: This should be shared
-
     long* sizes = malloc(sizes_bytes);
 
     
     barrier* bb = make_barrier(P);
 
-    //Sorting the data
     sample_sort(data, count, P, sizes, bb);
 
-    //Writting in output file.
     writeoutput(output, count, data);
 
-    //Freeing. 
     free_barrier(bb);
     free(data);
     free(sizes);
 
-    //Closing file descriptor.
     close(fd);
-
-    // munmap(sizes,sizes_bytes);
 
     return 0;
 }
