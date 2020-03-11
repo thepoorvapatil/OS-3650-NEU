@@ -619,26 +619,15 @@ typedef struct job {
     barrier* bb;
 } job;
 
-
-float*
-readinput(int fd, long count){
-    float* data = malloc(4 * count);
-
-    for(int ii = 0; ii < count; ++ii)
-        read(fd, &data[ii], 4);
-
-    return data;
-}
-
 void
-writeoutput(const char* file, long count, float* data){
+writeoutput(const char* file, long size, float* arr){
 
     int fd = open(file, O_CREAT | O_WRONLY | O_TRUNC, 0644);
     check_rv(fd);
 
-    write(fd, &count, 8);
-    for(int ii = 0; ii < count; ++ii){
-        write(fd, &data[ii], 4);
+    write(fd, &size, 8);
+    for(int ii = 0; ii < size; ++ii){
+        write(fd, &arr[ii], 4);
     }
     close(fd);
 }
@@ -816,18 +805,12 @@ main(int argc, char* argv[])
     int fd = open(fname, O_RDWR);
     check_rv(fd);
 
-
-    // long count;
-    // read(fd, &count, 8);
-    // float* data = readinput(fd, count);
-
     long* sizePointer = mmap(0, sizeof(long), PROT_READ, MAP_PRIVATE | MAP_FILE , fd, 0);
     long size = sizePointer[0];
     float* arr = mmap(0, size*sizeof(float), PROT_READ | PROT_WRITE , MAP_SHARED , fd, 0);
     arr = &arr[2]; // offset for array on mmap
 
     long sizes_bytes = P * sizeof(long);
-    // long* sizes = malloc(sizes_bytes);
     long* sizes = mmap(0, sizes_bytes, PROT_READ | PROT_WRITE, MAP_SHARED| MAP_ANONYMOUS, -1, 0); // TODO: This should be shared
 
     
@@ -838,10 +821,8 @@ main(int argc, char* argv[])
     writeoutput(output, size, arr);
 
     free_barrier(bb);
-    // free(data);
-    // free(sizes);
-
-    // close(fd);
+    
+    // TODO: munmap your mmaps
     munmap(sizes,sizes_bytes);
     munmap(arr, size*sizeof(float));
     munmap(sizePointer, sizeof(long));
