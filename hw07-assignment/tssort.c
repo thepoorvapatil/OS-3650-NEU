@@ -235,9 +235,9 @@ main(int argc, char* argv[])
     //open file for output
     int fdout = open(opfile, O_CREAT | O_WRONLY | O_TRUNC, 0644);
 
-    float* final = mmap (0, size*sizeof(float), PROT_READ | PROT_WRITE, MAP_SHARED, fdout, 0)
+    float* final = mmap (0, size*sizeof(float), PROT_READ | PROT_WRITE, MAP_SHARED, fdout, 0);
 
-    memcpy(final, arr, size*sizeof(float))
+    memcpy(final, arr, size*sizeof(float));
     free_barrier(bb);
     
     // TODO: munmap your mmaps
