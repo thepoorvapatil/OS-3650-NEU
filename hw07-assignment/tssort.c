@@ -719,11 +719,11 @@ job* arg = ((job*)args);
 floats* xs = make_floats(arg->size / arg->P);
 
 
-float start = arg->samps->data[arg->pnum];
-float end = arg->samps->data[arg->pnum + 1];
+// float start = arg->samps->data[arg->pnum];
+// float end = arg->samps->data[arg->pnum + 1];
 
 for(int ii = 0; ii < arg->size; ++ii){
-    if (arg->data[ii] >= start && arg->data[ii] < end){
+    if (arg->data[ii] >= arg->samps->data[arg->pnum] && arg->data[ii] < arg->samps->data[arg->pnum + 1]){
         floats_push(xs, arg->data[ii]);
     }
 }
@@ -735,7 +735,6 @@ printf("%d: start %.04f, count %ld\n", arg->pnum, arg->samps->data[arg->pnum], a
 qsort_floats(xs);
 
 barrier_wait(arg->bb);
-
 
 long index = start_sum(arg->sizes, arg->pnum);
 long counter = 0; 
@@ -752,9 +751,6 @@ free(arg);
 
 return 0;
 }
-
-
-
 
 void
 run_sort_workers(float* data, long size, int P, floats* samps, long* sizes, barrier* bb)
