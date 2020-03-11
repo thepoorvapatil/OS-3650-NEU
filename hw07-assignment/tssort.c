@@ -741,7 +741,7 @@ long index = start_sum(arg->sizes, arg->pnum);
 long counter = 0; 
 
 while (index < end_sum(arg->sizes, arg->pnum)){
-    arg->data[index] = xs->data[kk];
+    arg->data[index] = xs->data[counter];
     counter++;			
     index++;
 }
@@ -769,7 +769,7 @@ pthread_t threads[P];
 		args->data = data;
 		args->size = size;
 		args->P = P;
-		args->samps = sample_arr;
+		args->samps = samps;
 		args->sizes = sizes;
 		args->bb = bb;
 		int rv = pthread_create(&(threads[ii]), 0,  sort_worker, args);
