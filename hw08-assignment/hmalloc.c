@@ -144,12 +144,12 @@ hmalloc(size_t size)
     // TODO: Actually allocate memory with mmap and a free list.
 
     if (size < PAGE_SIZE) {
-        husky_node* new_node = 0; 
+        husky_node* new_block = 0; 
         husky_node* curr = husky_head;
         husky_node* prev = 0;
         while (curr != 0) {
             if (curr->size >= size) {
-            new_node = curr;
+            new_block = curr;
 
             if (prev != 0) {
                 prev->next = curr->next;
@@ -164,27 +164,27 @@ hmalloc(size_t size)
             curr = curr->next;
         }
 
-        if (new_node == 0) {
-            new_node = mmap(0, PAGE_SIZE, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
-            assert(new_node != MAP_FAILED);
+        if (new_block == 0) {
+            new_block = mmap(0, PAGE_SIZE, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
+            assert(new_block != MAP_FAILED);
             stats.pages_mapped += 1;
-            new_node->size = PAGE_SIZE;
+            new_block->size = PAGE_SIZE;
         }
 
-        if ((new_node->size > size) && (new_node->size - size >= sizeof(husky_node))) {
+        if ((new_block->size > size) && (new_block->size - size >= sizeof(husky_node))) {
             
-            void* address = (void*) new_node + size;
+            void* address = (void*) new_block + size;
 
             // create new node from address
             husky_node* leftover = (husky_node*) address;
-            leftover->size = new_node->size - size;
+            leftover->size = new_block->size - size;
 
             insert_list(leftover);
 
-            new_node->size = size;
+            new_block->size = size;
         }
 
-        return (void*) new_node + sizeof(size_t);
+        return (void*) new_block + sizeof(size_t);
     }
 
     //greater than/equal to page size
