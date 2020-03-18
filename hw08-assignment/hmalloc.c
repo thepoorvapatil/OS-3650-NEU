@@ -1,4 +1,3 @@
-
 #include <stdlib.h>
 #include <sys/mman.h>
 #include <stdio.h>
@@ -29,11 +28,11 @@ free_list_length()
 {
     // TODO: Calculate the length of the free list.
     long length = 0;
-    husky_node* cur = husky_head;
+    husky_node* curr = husky_head;
 
-    while (cur != 0) {
+    while (curr != 0) {
       length += 1;
-      cur = cur->next;
+      curr = curr->next;
     }
 
     return length;
@@ -84,20 +83,20 @@ insert_list(husky_node* node) {
         return;
     }
 
-    husky_node* cur = husky_head;
+    husky_node* curr = husky_head;
     husky_node* prev = 0;
-    while (cur != 0) {
+    while (curr != 0) {
         // current node greater than address,
-        if ((void*) cur > (void*) node) {
+        if ((void*) curr > (void*) node) {
 
             size_t prev_size = 0;
             if (prev != 0) {
                 prev_size = prev->size;
             }
 
-            if (((void*) prev + prev_size == (void*) node) && ((void*) node + node->size == (void*) cur)) {
-                prev->size = prev->size + node->size + cur->size;
-                prev->next = cur->next;
+            if (((void*) prev + prev_size == (void*) node) && ((void*) node + node->size == (void*) curr)) {
+                prev->size = prev->size + node->size + curr->size;
+                prev->next = curr->next;
             }
 
             // node is adjacent to end of prev
@@ -106,13 +105,13 @@ insert_list(husky_node* node) {
             }
 
             //node is adjacent to beginning of curr
-            else if ((void*) node + node->size == (void*) cur) {
-                node->size = node->size + cur->size;
+            else if ((void*) node + node->size == (void*) curr) {
+                node->size = node->size + curr->size;
 
                 if (prev != 0) {
                 prev->next = node; 
                 }
-                node->next = cur->next; 
+                node->next = curr->next; 
             }
 
             else {
@@ -120,7 +119,7 @@ insert_list(husky_node* node) {
                 if (prev != 0) {
                 prev->next = node;
                 }
-                node->next = cur;
+                node->next = curr;
             }
 
             // insert at beginning of the free list
@@ -131,8 +130,8 @@ insert_list(husky_node* node) {
             break;
 
         }
-        prev = cur; 
-        cur = cur->next;
+        prev = curr; 
+        curr = curr->next;
     }
 }
 
@@ -145,47 +144,47 @@ hmalloc(size_t size)
     // TODO: Actually allocate memory with mmap and a free list.
 
     if (size < PAGE_SIZE) {
-        husky_node* big_enough_block = 0; 
-        husky_node* cur = husky_head;
+        husky_node* new_node = 0; 
+        husky_node* curr = husky_head;
         husky_node* prev = 0;
-        while (cur != 0) {
-            if (cur->size >= size) {
-            big_enough_block = cur;
+        while (curr != 0) {
+            if (curr->size >= size) {
+            new_node = curr;
 
             if (prev != 0) {
-                prev->next = cur->next;
+                prev->next = curr->next;
             } else {
                 
-                husky_head = cur->next;
+                husky_head = curr->next;
             }
 
             break;
             }
-            prev = cur;
-            cur = cur->next;
+            prev = curr;
+            curr = curr->next;
         }
 
-        if (big_enough_block == 0) {
-            big_enough_block = mmap(0, PAGE_SIZE, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
-            assert(big_enough_block != MAP_FAILED);
+        if (new_node == 0) {
+            new_node = mmap(0, PAGE_SIZE, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
+            assert(new_node != MAP_FAILED);
             stats.pages_mapped += 1;
-            big_enough_block->size = PAGE_SIZE;
+            new_node->size = PAGE_SIZE;
         }
 
-        if ((big_enough_block->size > size) && (big_enough_block->size - size >= sizeof(husky_node))) {
+        if ((new_node->size > size) && (new_node->size - size >= sizeof(husky_node))) {
             
-            void* address = (void*) big_enough_block + size;
+            void* address = (void*) new_node + size;
 
             // create new node from address
             husky_node* leftover = (husky_node*) address;
-            leftover->size = big_enough_block->size - size;
+            leftover->size = new_node->size - size;
 
             insert_list(leftover);
 
-            big_enough_block->size = size;
+            new_node->size = size;
         }
 
-        return (void*) big_enough_block + sizeof(size_t);
+        return (void*) new_node + sizeof(size_t);
     }
 
     //greater than/equal to page size
