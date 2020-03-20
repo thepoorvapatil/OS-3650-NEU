@@ -1,7 +1,0 @@
-&
-tests/sleep_two.pl
-perl
-one
-echo
-3
-sleep
