@@ -1,5 +1,6 @@
 #ifndef HMALLOC_H
 #define HMALLOC_H
+#include <stddef.h>
 
 // Husky Malloc Interface
 // cs3650 Starter Code
