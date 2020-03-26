@@ -1,0 +1,33 @@
+OS:	Microsoft Windows 10 Home, used the ubuntu bash shell built into windows 10
+Processor	Intel(R) Core(TM) i7-6500U CPU @ 2.50GHz, 2601 Mhz, 2 Core(s), 4 Logical Processor(s)
+RAM: 8 GB
+
+
+-----------------------------------------------------
+          |  1000  |  5000  | 10000 | 15000 | 50000 |
+----------|------------------------------------------
+List Sys  |  0.033 |  0.096 | 0.184 | 0.291 | 1.068 |
+----------|------------------------------------------
+Ivec Sys  |  0.048 |  0.094 | 0.185 | 0.305 | 1.018 |
+----------|------------------------------------------
+List HW7  |  3.115 | >1min  | >2min | >5min | n/a   |
+----------|------------------------------------------
+Ivec HW7  |  0.105 |  3.979 | 19.775| 47.990| >2min |
+----------|------------------------------------------
+List par  |  0.036 |  0.109 | 0.444 | 0.676 | 2.790 |
+----------|------------------------------------------
+Ivec Opt  |  0.032 |  0.064 | 0.090 | 0.136 | 0.409 |
+----------|------------------------------------------
+
+
+To get an efficient allocator, we used bins of common sizes, each powers of 2,
+and used that to improve the time spent searching for a correctly sized bin.
+We also increased the size of each allocation, so that we would not need to call
+mmap as many times.  We also experimented with doubly linked lists, but that
+didn't end up going anywhere.  We also attempted to implement coalescing inside
+the bins, but it was not efficient enough.
+
+Our results show that our results for the ivec were faster than the system, but
+our list results were slower than the system.  As for why, I'm not really sure.
+It could is most likely due to lock contention in the mutex, as we were having
+a lot of trouble with that while working on the problem.
