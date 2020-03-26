@@ -1,3 +1,6 @@
 {
-    "C_Cpp.errorSquiggles": "Abled"
+    "C_Cpp.errorSquiggles": "Abled",
+    "files.associations": {
+        "xmalloc.h": "c"
+    }
 }
