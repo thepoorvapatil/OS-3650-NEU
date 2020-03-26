@@ -508,7 +508,7 @@ void*
 hrealloc(void* prev, size_t bytes)
 {
 	if (prev == NULL) {
-		return xmalloc(bytes);
+		return hmalloc(bytes);
 	}
 	void* start = prev - sizeof(size_t);
 	size_t* size = start;
@@ -538,12 +538,12 @@ hrealloc(void* prev, size_t bytes)
 	} else {
 		void* start = prev - sizeof(size_t);
 		size_t* size = start;
-		// xmalloc new memory
-		void* newMem = xmalloc(bytes);
+		// hmalloc new memory
+		void* newMem = hmalloc(bytes);
 		// copy over data to new memory
 		memcpy(newMem, prev, *size);
-		// xfree old memory
-		xfree(prev);
+		// hfree old memory
+		hfree(prev);
 		return newMem;
 	}
 	return 0;
