@@ -223,3 +223,35 @@ hfree(void* item)
     }
 }
 
+// void* hrealloc(void* item, size_t size)
+// {
+//     // Get new chunk from hmalloc
+//     void* newChunk = hmalloc(size);
+
+//     // Initialize the new chunk to 0.
+//     newChunk = memset(newChunk, 0, size);
+
+//     // Copy the data from item into the new chunk.
+//     size_t oldSize = block_size(item, PREV);
+//     newChunk = memcpy(newChunk, item, oldSize);
+    
+//     // Free item
+//     hfree(item);
+
+//     return newChunk;
+// }
+
+void*
+hrealloc(void* item, size_t size) {
+  char* result = (char*) hmalloc(size);
+
+  char* copy = (char*) item;
+
+  size_t* original_size_ptr = (item - sizeof(size_t));
+  size_t original_size = *original_size_ptr;
+
+  memcpy(result, copy, original_size);
+
+  hfree(item);
+  return result;
+}
