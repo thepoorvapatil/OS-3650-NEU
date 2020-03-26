@@ -54,7 +54,7 @@ nu_free_list_length() {
 }
 
 void
-nu_print_free_list() {
+nu_print_free_list() { // no need
   nu_free_cell* pp = nu_free_list;
   printf("= Free list: =\n");
 

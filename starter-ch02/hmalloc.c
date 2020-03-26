@@ -23,6 +23,21 @@ const size_t PAGE_SIZE = 4096;
 static hm_stats stats; // This initializes the stats to 0.
 static husky_node* husky_head;
 
+void*
+hrealloc(void* item, size_t size) {
+  char* result = (char*) hmalloc(size);
+
+  char* copy = (char*) item;
+
+  size_t* original_size_ptr = (item - sizeof(size_t));
+  size_t original_size = *original_size_ptr;
+
+  memcpy(result, copy, original_size);
+
+  hfree(item);
+  return result;
+}
+
 long
 free_list_length()
 {
@@ -221,37 +236,4 @@ hfree(void* item)
         assert(rv != -1);
         stats.pages_unmapped += num_pages;
     }
-}
-
-// void* hrealloc(void* item, size_t size)
-// {
-//     // Get new chunk from hmalloc
-//     void* newChunk = hmalloc(size);
-
-//     // Initialize the new chunk to 0.
-//     newChunk = memset(newChunk, 0, size);
-
-//     // Copy the data from item into the new chunk.
-//     size_t oldSize = block_size(item, PREV);
-//     newChunk = memcpy(newChunk, item, oldSize);
-    
-//     // Free item
-//     hfree(item);
-
-//     return newChunk;
-// }
-
-void*
-hrealloc(void* item, size_t size) {
-  char* result = (char*) hmalloc(size);
-
-  char* copy = (char*) item;
-
-  size_t* original_size_ptr = (item - sizeof(size_t));
-  size_t original_size = *original_size_ptr;
-
-  memcpy(result, copy, original_size);
-
-  hfree(item);
-  return result;
 }
