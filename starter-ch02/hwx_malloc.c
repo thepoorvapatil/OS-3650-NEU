@@ -1,6 +1,8 @@
 
 // #include "xmalloc.h"
 #include "hmalloc.h"
+#include <stddef.h>
+
 
 
 // TODO: This file should be replaced by another allocator implementation.
