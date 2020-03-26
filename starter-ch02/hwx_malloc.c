@@ -1,5 +1,5 @@
 
-// #include "xmalloc.h"
+#include "xmalloc.h"
 #include "hmalloc.h"
 #include <stddef.h>
 
