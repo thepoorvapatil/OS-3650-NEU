@@ -6,25 +6,66 @@
 #include <string.h>
 
 #include "opt_malloc.h"
-#include "math_functions.h"
 
-typedef struct free_cell {
+
+int
+ilog2(long x)
+{
+    int counter = 0;
+    long num = 1;
+    while (num < x)
+    {
+        num <<= 1;
+        counter++;
+    }
+    return counter;
+}
+
+int
+ilog2floor(long x)
+{
+    if (x == 0) {
+        return 0;
+    }
+    
+    int counter = -1;
+    long num = 1;
+    while (num <= x)
+    {
+        num <<= 1;
+        counter++;
+    }
+    return counter;
+}
+
+
+int ipow2 (long x)
+{
+    long num = 1;
+    while (x > 0) {
+    num <<= 1;
+    x--;
+    }
+    return num;
+}
+
+typedef struct husky_node {
 	size_t size;
-	struct free_cell* next;
-} free_cell;
+	struct husky_node* next;
+} husky_node;
 
 const size_t PAGE_SIZE = 4096;
 __thread  hm_stats stats; // This initializes the stats to 0.
-__thread free_cell* bins[7] = {0, 0, 0, 0, 0, 0, 0};
+__thread husky_node* bins[7] = {0, 0, 0, 0, 0, 0, 0};
 
-void add_mem_to_bins(free_cell* cell);
+void add_mem_to_bins(husky_node* cell);
 
 void
 free_list_length()
 {
 	int vals[7] = {32, 64, 128, 256, 512, 1024, 2048};
 	int counts[7] = {0, 0, 0, 0, 0, 0, 0};
-	free_cell* head = NULL;
+	husky_node* head = NULL;
 	for (int ii = 0; ii < 7; ++ii) {
 		head = bins[ii];
 		while (head != NULL) {
@@ -35,12 +76,14 @@ free_list_length()
 	}
 }
 
+//CHANGED
 hm_stats*
 hgetstats()
 {
     return &stats;
 }
 
+//UNCHANGED
 void
 hprintstats()
 {
@@ -52,6 +95,7 @@ hprintstats()
 	free_list_length();
 }
 
+//UNCHANGED
 static
 size_t
 div_up(size_t xx, size_t yy)
@@ -72,7 +116,7 @@ void
 coalesce_free_list(int bin)
 {
 	// Coalesce the bin
-	free_cell* head = bins[bin];
+	husky_node* head = bins[bin];
 	while(head != NULL && head->next != NULL) {
 		if (((int64_t)head + head->size == ((int64_t)head->next))
 				&& (head->size + head->next->size != 96)) {
@@ -82,9 +126,9 @@ coalesce_free_list(int bin)
 		head = head->next;
 	}
 	// Add the coalesced cells to their larger-sized bins
-	free_cell* prev = NULL;
+	husky_node* prev = NULL;
 	head = bins[bin];
-	free_cell* retCell = NULL;
+	husky_node* retCell = NULL;
 	int size = ipow2(bin + 5);
 	while(head != NULL) {
 		if (head->size > size) {
@@ -100,7 +144,7 @@ coalesce_free_list(int bin)
 			retCell->next = NULL;
 			// A little duplicate code from add_mem_to_bins to quickly add it
 			int newBin = ilog2(retCell->size) - 5;
-			free_cell* binToAddTo = bins[newBin];
+			husky_node* binToAddTo = bins[newBin];
 			if (binToAddTo == NULL || (binToAddTo > retCell)) {
 				retCell->next = bins[newBin];
 				bins[newBin] = retCell;
@@ -128,7 +172,7 @@ round_to_next_power_of_two(size_t size)
 }
 
 void
-add_mem_to_bins(free_cell* cell)
+add_mem_to_bins(husky_node* cell)
 {	
 	size_t size = cell->size;
 	cell->next = NULL;
@@ -140,13 +184,13 @@ add_mem_to_bins(free_cell* cell)
 			bin = 6;
 		}
 		size_t nextSize = ipow2(bin + 5);
-		free_cell* newCell = (free_cell*)cCell;
+		husky_node* newCell = (husky_node*)cCell;
 		cCell += nextSize;
 		s -= nextSize;
 		newCell->size = nextSize;
 		newCell->next = NULL;
 
-		free_cell* binToAddTo = bins[bin];
+		husky_node* binToAddTo = bins[bin];
 		if (binToAddTo == NULL || (binToAddTo > newCell)) {
 			newCell->next = bins[bin];
 			bins[bin] = newCell;
@@ -166,7 +210,7 @@ void*
 remove_mem_from_bins(size_t size)
 {
 	int bin = ilog2(size) - 5;
-	free_cell* binToRemoveFrom = bins[bin];
+	husky_node* binToRemoveFrom = bins[bin];
 	if (binToRemoveFrom != NULL) {
 		// remove the first entry in list
 		bins[bin] = binToRemoveFrom->next;
@@ -176,17 +220,17 @@ remove_mem_from_bins(size_t size)
 		void* cell = NULL;
 		for (int ii = bin + 1; ii < 7; ++ii) {
 			if (bins[ii] != NULL) {
-				free_cell* largerCell = bins[ii];
+				husky_node* largerCell = bins[ii];
 				bins[ii] = largerCell->next;
 				size_t prevSize = largerCell->size;
 				// split the larger cell into the correct sizes
-				free_cell* new = largerCell; // the mem to be returned
+				husky_node* new = largerCell; // the mem to be returned
 				new->size = size;
 				new->next = NULL;
 				size_t newSize = prevSize - size;
 				char* cCell = (char*)new;
 				cCell += size;
-				free_cell* old = (free_cell*)cCell;
+				husky_node* old = (husky_node*)cCell;
 				old->size = newSize;
 				old->next = NULL;
 				// add the leftover chunk back into the bins
@@ -219,11 +263,11 @@ xmalloc(size_t size)
 			char* cCell = cell;
 			cCell += size;
 			void* leftover = (void*)cCell;
-			free_cell* fCell = (free_cell*)cell;
+			husky_node* fCell = (husky_node*)cell;
 			fCell->size = size;
 			fCell->next = NULL;
 			// add leftover memory to bins
-			free_cell* loCell = (free_cell*)leftover;
+			husky_node* loCell = (husky_node*)leftover;
 			loCell->size = PAGE_SIZE - size;
 			loCell->next = NULL;
 			add_mem_to_bins(loCell);
@@ -258,7 +302,7 @@ xfree(void* item)
 	stats.chunks_freed += 1;
 	char* start = item;
 	start -= sizeof(size_t);
-	free_cell* freedCell = (free_cell*)start;
+	husky_node* freedCell = (husky_node*)start;
 	if (freedCell->size < PAGE_SIZE) {
 		freedCell->next = NULL;
 		add_mem_to_bins(freedCell);

@@ -17,21 +17,21 @@
   } hm_stats;
 */
 
-typedef struct free_cell {
+typedef struct husky_node {
 	size_t size;
-	struct free_cell* next;
-} free_cell;
+	struct husky_node* next;
+} husky_node;
 
 const size_t PAGE_SIZE = 4096;
 static hm_stats stats; // This initializes the stats to 0.
-free_cell* free_list = NULL;
+husky_node* free_list = NULL;
 pthread_mutex_t free_list_lock;
 int free_list_lock_initialized = 0;
 
 long
 free_list_length()
 {
-    	free_cell* nxt = free_list;
+    	husky_node* nxt = free_list;
 	int count = 0;
 	while(nxt != NULL) {
 		count++;
@@ -81,8 +81,8 @@ removeMemFromFreeList(size_t size)
 	if (free_list == NULL) {
 		return 0;
 	}
-	free_cell* prev = NULL;
-	free_cell* head = free_list;
+	husky_node* prev = NULL;
+	husky_node* head = free_list;
 	void* cell = NULL;
 	while(head != NULL) {
 		if (head->size >= size) {
@@ -107,7 +107,7 @@ removeMemFromFreeList(size_t size)
 void
 sort_free_list()
 {
-	free_cell* x, *y, *e;
+	husky_node* x, *y, *e;
 
         x = free_list;
         free_list = NULL;
@@ -137,9 +137,9 @@ sort_free_list()
 void
 coalesce_free_list()
 {
-	free_cell* head = free_list;
+	husky_node* head = free_list;
 	size_t size = head->size;
-	free_cell* next = head->next;
+	husky_node* next = head->next;
 	// long length = free_list_length();
 	while(next != NULL) {
 		// size_t nextSize = next->size;
@@ -185,14 +185,14 @@ xmalloc(size_t size)
 			memLeftover = PAGE_SIZE - size;
 		}
 		// Add any extra memory back onto the free_list
-		if (memLeftover >= sizeof(free_cell)) {
+		if (memLeftover >= sizeof(husky_node)) {
 			char* cCell = cell;
 			cCell += size;
-			free_cell* fCell = (free_cell*)cCell;
+			husky_node* fCell = (husky_node*)cCell;
 			fCell->size = memLeftover;
 			fCell->next = NULL;
 			if (free_list != NULL) {
-				free_cell* head = free_list;
+				husky_node* head = free_list;
 				while(head->next != NULL) {
 					head = head->next;
 				}
@@ -232,11 +232,11 @@ xfree(void* item)
     	stats.chunks_freed += 1;
 	void* start = item - sizeof(size_t);
     	size_t* size = start;
-	free_cell* freedCell = (free_cell*)start;
+	husky_node* freedCell = (husky_node*)start;
 	if (*size < PAGE_SIZE) {
 		pthread_mutex_lock(&free_list_lock);
-		free_cell* head = free_list;
-		free_cell* next = head->next;
+		husky_node* head = free_list;
+		husky_node* next = head->next;
 		while(next != NULL) {
 			head = next;
 			next = next->next;
@@ -265,14 +265,14 @@ xrealloc(void* prev, size_t bytes)
 	size_t* size = start;
 	if (*size > bytes) {
 		int memLeftover = bytes - *size;
-		if (memLeftover >= sizeof(free_cell)) {
+		if (memLeftover >= sizeof(husky_node)) {
 			pthread_mutex_lock(&free_list_lock);
 			start += *size;
-			free_cell* fCell = (free_cell*)start;
+			husky_node* fCell = (husky_node*)start;
 			fCell->size = memLeftover;
 			fCell->next = NULL;
 			if (free_list != NULL) {
-				free_cell* head = free_list;
+				husky_node* head = free_list;
 				while(head->next != NULL) {
 					head = head->next;
 				}
