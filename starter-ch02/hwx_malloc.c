@@ -35,5 +35,5 @@ void*
 xrealloc(void* prev, size_t bytes)
 {
     // TODO: write realloc
-    return hrealloc(prev, bytes);
+    // return hrealloc(prev, bytes);
 }
