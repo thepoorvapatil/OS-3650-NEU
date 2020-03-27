@@ -19,6 +19,8 @@ __thread husky_node* bckts[7] = {0, 0, 0, 0, 0, 0, 0};
 void coalesce_husky_list(int bucket);
 void add_to_bckts(husky_node* bckt);
 
+
+
 int
 LOG(long x)
 {
