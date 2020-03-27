@@ -57,7 +57,7 @@ const size_t PAGE_SIZE = 4096;
 __thread  hm_stats stats; // This initializes the stats to 0.
 __thread husky_node* bckts[7] = {0, 0, 0, 0, 0, 0, 0};
 
-void add_mem_to_bckts(husky_node* cell);
+void add_to_bckts(husky_node* cell);
 
 void
 free_list_length()
@@ -75,7 +75,6 @@ free_list_length()
 	}
 }
 
-//CHANGED
 hm_stats*
 hgetstats()
 {
@@ -112,27 +111,27 @@ div_up(size_t xx, size_t yy)
 }
 
 void
-coalesce_free_list(int bin)
+coalesce_husky_list(int bucket)
 {
-	// Coalesce the bin
-	husky_node* head = bckts[bin];
+	husky_node* head = bckts[bucket];
 	while(head != NULL && head->next != NULL) {
-		if (((int64_t)head + head->size == ((int64_t)head->next))
+		if (((size_t)head + head->size == ((size_t)head->next))
 				&& (head->size + head->next->size != 96)) {
 			head->size += head->next->size;
 			head->next = head->next->next;
 		}
 		head = head->next;
 	}
-	// Add the coalesced cells to their larger-sized bckts
+
+	// Add coalesced buckets
 	husky_node* prev = NULL;
-	head = bckts[bin];
+	head = bckts[bucket];
 	husky_node* retCell = NULL;
-	int size = ipow2(bin + 5);
+	int size = ipow2(bucket + 5);
 	while(head != NULL) {
 		if (head->size > size) {
 			if (prev == NULL) {
-				bckts[bin] = head->next;
+				bckts[bucket] = head->next;
 			} else if (head->next == NULL) {
 				prev->next = NULL;
 			} else {
@@ -141,18 +140,20 @@ coalesce_free_list(int bin)
 			retCell = head;
 			head = head->next;
 			retCell->next = NULL;
-			// A little duplicate code from add_mem_to_bckts to quickly add it
-			int newBin = ilog2(retCell->size) - 5;
-			husky_node* binToAddTo = bckts[newBin];
-			if (binToAddTo == NULL || (binToAddTo > retCell)) {
-				retCell->next = bckts[newBin];
-				bckts[newBin] = retCell;
+			int newbucket = ilog2(retCell->size) - 5;
+			husky_node* AddToBucket = bckts[newbucket];
+
+            // add_to_bckts_helper();
+			if (AddToBucket == NULL || (AddToBucket > retCell)) {
+				retCell->next = bckts[newbucket];
+				bckts[newbucket] = retCell;
 			} else {
-				while(binToAddTo->next != NULL && (binToAddTo->next < retCell)) {
-					binToAddTo = binToAddTo->next;
+				while(AddToBucket->next != NULL && (AddToBucket->next < retCell)) {
+					AddToBucket = AddToBucket->next;
 				}
-				binToAddTo->next = retCell;
+				AddToBucket->next = retCell;
 			}
+
 		} else {
 			prev = head;
 			head = head->next;
@@ -171,50 +172,54 @@ round_to_next_power_of_two(size_t size)
 }
 
 void
-add_mem_to_bckts(husky_node* cell)
+add_to_bckts(husky_node* cell)
 {	
 	size_t size = cell->size;
 	cell->next = NULL;
 	int s = size;
 	char* cCell = (char*)cell;
 	while (s > 0) {
-		int bin = ilog2floor(s) - 5;
-		if (bin > 6) {
-			bin = 6;
+		int bucket = ilog2floor(s) - 5;
+		if (bucket > 6) {
+			bucket = 6;
 		}
-		size_t nextSize = ipow2(bin + 5);
+		size_t nextSize = ipow2(bucket + 5);
 		husky_node* newCell = (husky_node*)cCell;
 		cCell += nextSize;
 		s -= nextSize;
 		newCell->size = nextSize;
 		newCell->next = NULL;
 
-		husky_node* binToAddTo = bckts[bin];
-		if (binToAddTo == NULL || (binToAddTo > newCell)) {
-			newCell->next = bckts[bin];
-			bckts[bin] = newCell;
+		husky_node* AddToBucket = bckts[bucket];
+
+
+		if (AddToBucket == NULL || (AddToBucket > newCell)) {
+			newCell->next = bckts[bucket];
+			bckts[bucket] = newCell;
 		} else {
-			while(binToAddTo->next != NULL && (binToAddTo->next < newCell)) {
-				binToAddTo = binToAddTo->next;
+			while(AddToBucket->next != NULL && (AddToBucket->next < newCell)) {
+				AddToBucket = AddToBucket->next;
 			}
-			binToAddTo->next = newCell;
+			AddToBucket->next = newCell;
 		}
-		if (bin != 6) {
-			coalesce_free_list(bin);
+
+
+		if (bucket != 6) {
+			coalesce_free_list(bucket);
 		}
 	}
 }
 
 void*
-remove_mem_from_bckts(size_t size)
+remove_from_bckts(size_t size)
 {
-	int bin = ilog2(size) - 5;
-	husky_node* binToRemoveFrom = bckts[bin];
-	if (binToRemoveFrom != NULL) {
+	int bucket = ilog2(size) - 5;
+	husky_node* RemoveFromBucket = bckts[bin];
+	if (RemoveFromBucket != NULL) {
 		// remove the first entry in list
-		bckts[bin] = binToRemoveFrom->next;
-		binToRemoveFrom->next = NULL;
-		return (void*)binToRemoveFrom;
+		bckts[bin] = RemoveFromBucket->next;
+		RemoveFromBucket->next = NULL;
+		return (void*)RemoveFromBucket;
 	} else {
 		void* cell = NULL;
 		for (int ii = bin + 1; ii < 7; ++ii) {
@@ -233,7 +238,7 @@ remove_mem_from_bckts(size_t size)
 				old->size = newSize;
 				old->next = NULL;
 				// add the leftover chunk back into the bckts
-				add_mem_to_bckts(old);
+				add_to_bckts(old);
 				cell = (void*)new;
 				break;
 			}
@@ -250,7 +255,7 @@ xmalloc(size_t size)
 	if (size < PAGE_SIZE && size <= 2048) {
 		// Try to remove a power of 2 sized memory from bckts
 		size = round_to_next_power_of_two(size);
-		void* cell = remove_mem_from_bckts(size);
+		void* cell = remove_from_bckts(size);
 		if (cell != NULL) {
 			char* cCell = (char*)cell;
 			cCell += sizeof(size_t);
@@ -269,7 +274,7 @@ xmalloc(size_t size)
 			husky_node* loCell = (husky_node*)leftover;
 			loCell->size = PAGE_SIZE - size;
 			loCell->next = NULL;
-			add_mem_to_bckts(loCell);
+			add_to_bckts(loCell);
 			char* retMem = (char*)fCell;
 			retMem += sizeof(size_t);
 			return (void*)retMem;
@@ -304,7 +309,7 @@ xfree(void* item)
 	husky_node* freedCell = (husky_node*)start;
 	if (freedCell->size < PAGE_SIZE) {
 		freedCell->next = NULL;
-		add_mem_to_bckts(freedCell);
+		add_to_bckts(freedCell);
 	} else {
 		int numOfPages = div_up(freedCell->size, PAGE_SIZE);
 		stats.pages_unmapped += numOfPages;
