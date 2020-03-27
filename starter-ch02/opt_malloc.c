@@ -169,7 +169,20 @@ add_to_bckts(husky_node* bckt)
 	int s = size;
 	char* cbckt = (char*)bckt;
 	while (s > 0) {
-		int bucket = ilog2floor(s) - 5;
+        int X;
+        if (s == 0) 
+            X = 0;
+        else {
+            int counter = -1;
+            long num = 1;
+            while (num <= s)
+            {
+                num <<= 1;
+                counter++;
+            }
+            X = counter;
+        }
+		int bucket = X - 5;
 		if (bucket > 6) {
 			bucket = 6;
 		}
