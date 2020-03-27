@@ -25,6 +25,14 @@ typedef struct husky_node {
 	struct husky_node* next;
 } husky_node;
 
+typedef struct hm_stats {
+long pages_mapped;
+long pages_unmapped;
+long chunks_allocated;
+long chunks_freed;
+long free_length;
+} hm_stats;
+
 const size_t PAGE_SIZE = 4096;
 static hm_stats stats; // This initializes the stats to 0.
 husky_node* free_list = NULL;
