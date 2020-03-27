@@ -1,0 +1,39 @@
+
+My local machine specs:
+operating system: macOS Catalina 10.15.3
+processor model: 2.3 GHz Dual-Core Intel Core i5
+number of processor cores: 2
+amount of RAM: 8GB
+
+My virtual machine specs:
+operating system: Debian (64-bit)
+processor model: 
+number of processor cores: 2
+amount of RAM: 2048 MB
+
+CCIS server specs:
+operating system: CentOS Linux 7 (core)
+processor model: Intel(R) Xeon(R) Gold 5118 CPU @ 2.30 GHz
+number of processor cores: 4
+amount of RAM: 196294968 kB
+
+---------------------------------------------------------------
+
+Due to segmentation fault that I was unable to resolve, I could not properly test the program case.
+
++----------+--------+-------+-------+
+|          |  100   | 1000  | 1000  |
++----------+--------+-------+-------+
+| ivec-hwx | 0.0177 | 18.22 |       |
+| list-hwx |  0.015 |   243 | >500  |
+| ivec-opt |  0.002 | 0.006 | 0.213 |
+| list-opt |  0.002 | 0.031 | 0.410 |
+| ivec-sys |  0.001 | 0.003 | 0.039 |
+| list-sys |  0.002 | 0.019 | 0.241 |
++----------+--------+-------+-------+
+
+For an efficient allocator, I used buckets of similar sizes having powers of 2 which was used to improve the searching time for the right size of the bucket.
+and used that to improve the time spent searching for a correctly sized bin.
+I used 7 buckets for this, but from some research I understood that maybe using different sized buckets, lesser than 7 in number could have been used.
+
+
