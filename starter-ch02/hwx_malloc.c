@@ -20,29 +20,31 @@
 //    provided xv6 allocator.
 //  - Implement the "realloc" function for this allocator.
 
+typedef struct hm_stats {
+    long pages_mapped;
+    long pages_unmapped;
+    long chunks_allocated;
+    long chunks_freed;
+    long free_length;
+} hm_stats;
+
 typedef struct husky_node {
 	size_t size;
 	struct husky_node* next;
 } husky_node;
 
-typedef struct hm_stats {
-long pages_mapped;
-long pages_unmapped;
-long chunks_allocated;
-long chunks_freed;
-long free_length;
-} hm_stats;
+
 
 const size_t PAGE_SIZE = 4096;
 static hm_stats stats; // This initializes the stats to 0.
-husky_node* free_list = NULL;
-pthread_mutex_t free_list_lock;
-int free_list_lock_initialized = 0;
+husky_node* husky_list = NULL;
+pthread_mutex_t husky_list_lock;
+int husky_list_lock_initialized = 0;
 
 long
 free_list_length()
 {
-    husky_node* nxt = free_list;
+    husky_node* nxt = husky_list;
 	int count = 0;
 	while(nxt != NULL) {
 		count++;
@@ -89,16 +91,16 @@ div_up(size_t xx, size_t yy)
 void*
 removeMemFromFreeList(size_t size)
 {
-	if (free_list == NULL) {
+	if (husky_list == NULL) {
 		return 0;
 	}
 	husky_node* prev = NULL;
-	husky_node* head = free_list;
+	husky_node* head = husky_list;
 	void* cell = NULL;
 	while(head != NULL) {
 		if (head->size >= size) {
 			if (prev == NULL) {
-				free_list = head->next;
+				husky_list = head->next;
 			} else if (head->next == NULL) {
 				prev->next = NULL;
 			} else {
@@ -120,27 +122,27 @@ sort_free_list()
 {
 	husky_node* x, *y, *e;
 
-        x = free_list;
-        free_list = NULL;
+        x = husky_list;
+        husky_list = NULL;
 
         while(x != NULL) {
                 e = x;
                 x = x->next;
-                if (free_list != NULL) {
-                        if (e > free_list) {
-                                y = free_list;
+                if (husky_list != NULL) {
+                        if (e > husky_list) {
+                                y = husky_list;
                                 while ((y->next != NULL) && (e > y->next)) {
                                         y = y->next;
                                 }
                                 e->next = y->next;
                                 y->next = e;
                         } else {
-                                e->next = free_list;
-                                free_list = e;
+                                e->next = husky_list;
+                                husky_list = e;
                         }
                 } else {
                         e->next = NULL;
-                        free_list = e;
+                        husky_list = e;
                 }
         }
 }
@@ -148,7 +150,7 @@ sort_free_list()
 void
 coalesce_free_list()
 {
-	husky_node* head = free_list;
+	husky_node* head = husky_list;
 	size_t size = head->size;
 	husky_node* next = head->next;
 	// long length = free_list_length();
@@ -171,48 +173,48 @@ coalesce_free_list()
 void*
 xmalloc(size_t size)
 {
-	if (!free_list_lock_initialized) {
-		pthread_mutex_init(&free_list_lock, 0);
-		free_list_lock_initialized = 1;
+	if (!husky_list_lock_initialized) {
+		pthread_mutex_init(&husky_list_lock, 0);
+		husky_list_lock_initialized = 1;
 	}
     	stats.chunks_allocated += 1;
     	size += sizeof(size_t);
 	if (size < PAGE_SIZE) {
-		pthread_mutex_lock(&free_list_lock);
-		// Try to remove a *size* amount of memory from the free_list
+		pthread_mutex_lock(&husky_list_lock);
+		// Try to remove a *size* amount of memory from the husky_list
 		void* cell = NULL;
 		int memLeftover;
-		if (free_list != NULL) {
+		if (husky_list != NULL) {
 			cell = removeMemFromFreeList(size);
 		}
-		if (cell != NULL) { // Enough memory on free_list
+		if (cell != NULL) { // Enough memory on husky_list
 			size_t* cellSize = cell;
 			memLeftover = *cellSize - size;
-		} else { // Not enough memory on free_list
+		} else { // Not enough memory on husky_list
 			// Allocate a page of memory
 			cell = mmap(0, PAGE_SIZE, PROT_READ | PROT_WRITE,
 					 MAP_SHARED | MAP_ANONYMOUS, -1, 0);
 			stats.pages_mapped += 1;
 			memLeftover = PAGE_SIZE - size;
 		}
-		// Add any extra memory back onto the free_list
+		// Add any extra memory back onto the husky_list
 		if (memLeftover >= sizeof(husky_node)) {
 			char* cCell = cell;
 			cCell += size;
 			husky_node* fCell = (husky_node*)cCell;
 			fCell->size = memLeftover;
 			fCell->next = NULL;
-			if (free_list != NULL) {
-				husky_node* head = free_list;
+			if (husky_list != NULL) {
+				husky_node* head = husky_list;
 				while(head->next != NULL) {
 					head = head->next;
 				}
 				head->next = fCell;
 			} else {
-				free_list = fCell;
+				husky_list = fCell;
 			}
 		}
-		pthread_mutex_unlock(&free_list_lock);
+		pthread_mutex_unlock(&husky_list_lock);
 		// Store the new size at the beginning of the memory
 		size_t* sizePtr = cell;
 		*sizePtr = size;
@@ -245,8 +247,8 @@ xfree(void* item)
     	size_t* size = start;
 	husky_node* freedCell = (husky_node*)start;
 	if (*size < PAGE_SIZE) {
-		pthread_mutex_lock(&free_list_lock);
-		husky_node* head = free_list;
+		pthread_mutex_lock(&husky_list_lock);
+		husky_node* head = husky_list;
 		husky_node* next = head->next;
 		while(next != NULL) {
 			head = next;
@@ -258,7 +260,7 @@ xfree(void* item)
 
                 sort_free_list();
                 coalesce_free_list();
-		pthread_mutex_unlock(&free_list_lock);
+		pthread_mutex_unlock(&husky_list_lock);
 	} else {
 		int numOfPages = div_up(*size, PAGE_SIZE);
 		stats.pages_unmapped += numOfPages;
@@ -277,21 +279,21 @@ xrealloc(void* prev, size_t bytes)
 	if (*size > bytes) {
 		int memLeftover = bytes - *size;
 		if (memLeftover >= sizeof(husky_node)) {
-			pthread_mutex_lock(&free_list_lock);
+			pthread_mutex_lock(&husky_list_lock);
 			start += *size;
 			husky_node* fCell = (husky_node*)start;
 			fCell->size = memLeftover;
 			fCell->next = NULL;
-			if (free_list != NULL) {
-				husky_node* head = free_list;
+			if (husky_list != NULL) {
+				husky_node* head = husky_list;
 				while(head->next != NULL) {
 					head = head->next;
 				}
 				head->next = fCell;
 			} else {
-				free_list = fCell;
+				husky_list = fCell;
 			}
-			pthread_mutex_unlock(&free_list_lock);
+			pthread_mutex_unlock(&husky_list_lock);
 			*size = bytes;
 			return prev;
 		}
