@@ -16,6 +16,7 @@ const size_t PAGE_SIZE = 4096;
 __thread  hm_stats stats; // This initializes the stats to 0.
 __thread husky_node* bckts[7] = {0, 0, 0, 0, 0, 0, 0};
 
+void coalesce_husky_list(int bucket);
 void add_to_bckts(husky_node* bckt);
 
 int
