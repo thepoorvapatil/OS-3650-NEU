@@ -161,16 +161,6 @@ coalesce_husky_list(int bucket)
 	}
 }
 
-size_t
-round_to_next_power_of_two(size_t size)
-{
-	if (size <= 32) {
-		return 32;
-	} else {
-		return ipow2(ilog2(size));
-	}
-}
-
 void
 add_to_bckts(husky_node* cell)
 {	
@@ -254,7 +244,12 @@ xmalloc(size_t size)
 	size += sizeof(size_t);
 	if (size < PAGE_SIZE && size <= 2048) {
 		// Try to remove a power of 2 sized memory from bckts
-		size = round_to_next_power_of_two(size);
+		// size = size <= 32 ? 32 : ipow2(ilog2(size);
+        if (size <= 32)
+		    size=32;
+        else
+		    size = ipow2(ilog2(size));
+        
 		void* cell = remove_from_bckts(size);
 		if (cell != NULL) {
 			char* cCell = (char*)cell;
