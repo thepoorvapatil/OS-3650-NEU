@@ -1,6 +1,3 @@
-
-
-
 #include <stdlib.h>
 #include <sys/mman.h>
 #include <stdio.h>
@@ -9,7 +6,6 @@
 #include <stddef.h>
 
 #include "xmalloc.h"
-#include "hmalloc.h"
 // TODO: This file should be replaced by another allocator implementation.
 //
 // If you have a working allocator from the previous HW, use that.
