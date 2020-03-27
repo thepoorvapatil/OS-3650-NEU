@@ -7,8 +7,19 @@
 #include "opt_malloc.h"
 #include "xmalloc.h"
 
+typedef struct husky_node {
+	size_t size;
+	struct husky_node* next;
+} husky_node;
+
+const size_t PAGE_SIZE = 4096;
+__thread  hm_stats stats; // This initializes the stats to 0.
+__thread husky_node* bckts[7] = {0, 0, 0, 0, 0, 0, 0};
+
+void add_to_bckts(husky_node* bckt);
+
 int
-ilog2(long x)
+LOG(long x)
 {
     int counter = 0;
     long num = 1;
@@ -20,25 +31,8 @@ ilog2(long x)
     return counter;
 }
 
-int
-ilog2floor(long x)
-{
-    if (x == 0) {
-        return 0;
-    }
-    
-    int counter = -1;
-    long num = 1;
-    while (num <= x)
-    {
-        num <<= 1;
-        counter++;
-    }
-    return counter;
-}
-
-
-int ipow2 (long x)
+int 
+powerof2 (long x)
 {
     long num = 1;
     while (x > 0) {
@@ -48,16 +42,61 @@ int ipow2 (long x)
     return num;
 }
 
-typedef struct husky_node {
-	size_t size;
-	struct husky_node* next;
-} husky_node;
+void
+add_to_bckts(husky_node* bckt)
+{	
+	size_t size = bckt->size;
+	bckt->next = NULL;
+	int s = size;
+	char* cbckt = (char*)bckt;
+	while (s > 0) {
 
-const size_t PAGE_SIZE = 4096;
-__thread  hm_stats stats; // This initializes the stats to 0.
-__thread husky_node* bckts[7] = {0, 0, 0, 0, 0, 0, 0};
+        //calculations
+        int X;
+        if (s == 0) 
+            X = 0;
+        else {
+            int counter = -1;
+            long num = 1;
+            while (num <= s)
+            {
+                num <<= 1;
+                counter++;
+            }
+            X = counter;
+        }
+        // end of calcs
 
-void add_to_bckts(husky_node* bckt);
+		int bucket = X - 5;
+		if (bucket > 6) {
+			bucket = 6;
+		}
+		size_t nextSize = powerof2(bucket + 5);
+		husky_node* newbckt = (husky_node*)cbckt;
+		cbckt += nextSize;
+		s -= nextSize;
+		newbckt->size = nextSize;
+		newbckt->next = NULL;
+
+		husky_node* AddToBucket = bckts[bucket];
+
+
+		if (AddToBucket == NULL || (AddToBucket > newbckt)) {
+			newbckt->next = bckts[bucket];
+			bckts[bucket] = newbckt;
+		} else {
+			while(AddToBucket->next != NULL && (AddToBucket->next < newbckt)) {
+				AddToBucket = AddToBucket->next;
+			}
+			AddToBucket->next = newbckt;
+		}
+
+		if (bucket != 6) {
+			coalesce_husky_list(bucket);
+		}
+	}
+}
+
 
 void
 free_list_length()
@@ -127,7 +166,7 @@ coalesce_husky_list(int bucket)
 	husky_node* prev = NULL;
 	head = bckts[bucket];
 	husky_node* retbckt = NULL;
-	int size = ipow2(bucket + 5);
+	int size = powerof2(bucket + 5);
 	while(head != NULL) {
 		if (head->size > size) {
 			if (prev == NULL) {
@@ -140,7 +179,7 @@ coalesce_husky_list(int bucket)
 			retbckt = head;
 			head = head->next;
 			retbckt->next = NULL;
-			int newbucket = ilog2(retbckt->size) - 5;
+			int newbucket = LOG(retbckt->size) - 5;
 			husky_node* AddToBucket = bckts[newbucket];
 
             // add_to_bckts_helper();
@@ -161,61 +200,11 @@ coalesce_husky_list(int bucket)
 	}
 }
 
-void
-add_to_bckts(husky_node* bckt)
-{	
-	size_t size = bckt->size;
-	bckt->next = NULL;
-	int s = size;
-	char* cbckt = (char*)bckt;
-	while (s > 0) {
-        int X;
-        if (s == 0) 
-            X = 0;
-        else {
-            int counter = -1;
-            long num = 1;
-            while (num <= s)
-            {
-                num <<= 1;
-                counter++;
-            }
-            X = counter;
-        }
-		int bucket = X - 5;
-		if (bucket > 6) {
-			bucket = 6;
-		}
-		size_t nextSize = ipow2(bucket + 5);
-		husky_node* newbckt = (husky_node*)cbckt;
-		cbckt += nextSize;
-		s -= nextSize;
-		newbckt->size = nextSize;
-		newbckt->next = NULL;
-
-		husky_node* AddToBucket = bckts[bucket];
-
-
-		if (AddToBucket == NULL || (AddToBucket > newbckt)) {
-			newbckt->next = bckts[bucket];
-			bckts[bucket] = newbckt;
-		} else {
-			while(AddToBucket->next != NULL && (AddToBucket->next < newbckt)) {
-				AddToBucket = AddToBucket->next;
-			}
-			AddToBucket->next = newbckt;
-		}
-
-		if (bucket != 6) {
-			coalesce_husky_list(bucket);
-		}
-	}
-}
 
 void*
 remove_from_bckts(size_t size)
 {
-	int bucket = ilog2(size) - 5;
+	int bucket = LOG(size) - 5;
 	husky_node* RemoveFromBucket = bckts[bucket];
 	if (RemoveFromBucket != NULL) {
 		// remove first entry
@@ -256,11 +245,11 @@ xmalloc(size_t size)
 	size += sizeof(size_t);
 	if (size < PAGE_SIZE && size <= 2048) {
 		// memeory of size power of 2
-		// size = size <= 32 ? 32 : ipow2(ilog2(size);
+		// size = size <= 32 ? 32 : powerof2(LOG(size);
         if (size <= 32)
 		    size=32;
         else
-		    size = ipow2(ilog2(size));
+		    size = powerof2(LOG(size));
         
 		void* tmp = remove_from_bckts(size);
 		if (tmp != NULL) {
@@ -310,6 +299,7 @@ void
 xfree(void* item)
 {
 	stats.chunks_freed += 1;
+
 	char* start = item;
 	start -= sizeof(size_t);
 	husky_node* newList = (husky_node*)start;
@@ -334,11 +324,11 @@ xrealloc(void* prev, size_t bytes)
 	char* cNewMemory = (char*)newMemory;
 	cNewMemory -= sizeof(size_t);
 	size_t sizeNewMem = *((size_t*)cNewMemory);
-	if (sizeNewMem >= sizePrev) {
+	if (sizeNewMem >= sizePrev)
 		memcpy(newMemory, prev, sizePrev - sizeof(size_t));
-	} else {
+	else 
 		memcpy(newMemory, prev, sizePrev - sizeNewMem - sizeof(size_t));
-	}
+	
 	xfree(prev);
 	return newMemory;
 }
