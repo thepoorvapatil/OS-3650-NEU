@@ -205,7 +205,7 @@ add_to_bckts(husky_node* cell)
 
 
 		if (bucket != 6) {
-			coalesce_free_list(bucket);
+			coalesce_husky_list(bucket);
 		}
 	}
 }
@@ -214,15 +214,15 @@ void*
 remove_from_bckts(size_t size)
 {
 	int bucket = ilog2(size) - 5;
-	husky_node* RemoveFromBucket = bckts[bin];
+	husky_node* RemoveFromBucket = bckts[bucket];
 	if (RemoveFromBucket != NULL) {
 		// remove the first entry in list
-		bckts[bin] = RemoveFromBucket->next;
+		bckts[bucket] = RemoveFromBucket->next;
 		RemoveFromBucket->next = NULL;
 		return (void*)RemoveFromBucket;
 	} else {
 		void* cell = NULL;
-		for (int ii = bin + 1; ii < 7; ++ii) {
+		for (int ii = bucket + 1; ii < 7; ++ii) {
 			if (bckts[ii] != NULL) {
 				husky_node* largerCell = bckts[ii];
 				bckts[ii] = largerCell->next;
