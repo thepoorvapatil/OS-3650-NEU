@@ -281,7 +281,7 @@ int free_list_lock_initialized = 0;
 long
 free_list_length()
 {
-    	husky_node* nxt = free_list;
+    husky_node* nxt = free_list;
 	int count = 0;
 	while(nxt != NULL) {
 		count++;
@@ -408,7 +408,7 @@ coalesce_free_list()
 }
 
 void*
-hmalloc(size_t size)
+xmalloc(size_t size)
 {
 	if (!free_list_lock_initialized) {
 		pthread_mutex_init(&free_list_lock, 0);
@@ -477,7 +477,7 @@ hmalloc(size_t size)
 }
 
 void
-hfree(void* item)
+xfree(void* item)
 {
     	stats.chunks_freed += 1;
 	void* start = item - sizeof(size_t);
@@ -506,10 +506,10 @@ hfree(void* item)
 }
 
 void* 
-hrealloc(void* prev, size_t bytes)
+xrealloc(void* prev, size_t bytes)
 {
 	if (prev == NULL) {
-		return hmalloc(bytes);
+		return xmalloc(bytes);
 	}
 	void* start = prev - sizeof(size_t);
 	size_t* size = start;
@@ -539,12 +539,12 @@ hrealloc(void* prev, size_t bytes)
 	} else {
 		void* start = prev - sizeof(size_t);
 		size_t* size = start;
-		// hmalloc new memory
-		void* newMem = hmalloc(bytes);
+		// xmalloc new memory
+		void* newMem = xmalloc(bytes);
 		// copy over data to new memory
 		memcpy(newMem, prev, *size);
-		// hfree old memory
-		hfree(prev);
+		// xfree old memory
+		xfree(prev);
 		return newMem;
 	}
 	return 0;
