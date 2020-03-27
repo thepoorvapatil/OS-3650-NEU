@@ -144,7 +144,7 @@ husky_list_sort()
             }
         } else {
             z->next = NULL;
-            husky_list = e;
+            husky_list = z;
         }
     }
 }
