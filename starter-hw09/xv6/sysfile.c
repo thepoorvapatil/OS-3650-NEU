@@ -457,7 +457,7 @@ int
 sys_getiostats(void)
 {
   struct file *f;
-  struct stat *st;
+  struct iostats *st;
 
   if(argfd(0, 0, &f) < 0 || argptr(1, (void*)&st, sizeof(*st)) < 0)
     return -1;
