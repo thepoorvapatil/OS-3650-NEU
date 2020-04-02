@@ -95,6 +95,19 @@ filestat(struct file *f, struct stat *st)
   return -1;
 }
 
+int fileiostat(struct file *f, struct iostats *st);
+
+int
+fileiostat(struct file *f, struct iostats *st){
+  if(f->type == FD_INODE){
+    st->read_bytes=f->readbytes;
+    st->write_bytes=f->writebytes;
+    return 0;
+  }
+  return -1;
+}
+
+
 // Read from file f.
 int
 fileread(struct file *f, char *addr, int n)
@@ -169,14 +182,3 @@ filewrite(struct file *f, char *addr, int n)
   panic("filewrite");
 }
 
-int fileiostat(struct file *f, struct iostats *st);
-
-int
-fileiostat(struct file *f, struct iostats *st){
-  if(f->type == FD_INODE){
-    st->read_bytes=f->readbytes;
-    st->write_bytes=f->writebytes;
-    return 0;
-  }
-  return -1;
-}

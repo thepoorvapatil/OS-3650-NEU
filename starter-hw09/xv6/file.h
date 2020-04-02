@@ -36,6 +36,4 @@ struct devsw {
 
 extern struct devsw devsw[];
 
-int fileiostat(struct file *f, struct iostats *st);
-
 #define CONSOLE 1
