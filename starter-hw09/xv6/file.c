@@ -17,6 +17,8 @@ struct {
   struct file file[NFILE];
 } ftable;
 
+int fileiostat(struct file *f, struct iostats *st);
+
 void
 fileinit(void)
 {
