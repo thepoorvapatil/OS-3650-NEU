@@ -96,6 +96,8 @@ filestat(struct file *f, struct stat *st)
 int
 fileiostat(struct file *f, struct iostats *st){
   if(f->type == FD_INODE){
+    ilock(f->ip);
+    iunlock(f->ip);
     st->read_bytes=f->readbytes;
     st->write_bytes=f->writebytes;
     return 0;
