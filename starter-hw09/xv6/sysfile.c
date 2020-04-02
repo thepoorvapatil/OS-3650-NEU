@@ -451,6 +451,7 @@ sys_pipe(void)
   return 0;
 }
 
+int sys_getiostats(void);
 
 int
 sys_getiostats(void)
