@@ -400,6 +400,14 @@ sys_exec(void)
   int i;
   uint uargv, uarg;
 
+  struct file *f;
+  for(int fd=0; fd<=NOFILE; fd++){
+    if ((f=myproc()->ofile[fd])!= NULL){
+        f->readbytes=0;
+        f->writebytes=0;
+    }
+  }
+
   if(argstr(0, &path) < 0 || argint(1, (int*)&uargv) < 0){
     return -1;
   }
@@ -441,4 +449,16 @@ sys_pipe(void)
   fd[0] = fd0;
   fd[1] = fd1;
   return 0;
+}
+
+
+int
+sys_getiostats(void)
+{
+  struct file *f;
+  struct stat *st;
+
+  if(argfd(0, 0, &f) < 0 || argptr(1, (void*)&st, sizeof(*st)) < 0)
+    return -1;
+  return fileiostat(f, st); //0 for success and -1 for failure
 }
