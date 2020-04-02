@@ -402,7 +402,7 @@ sys_exec(void)
 
   struct file *f;
   for(int fd=0; fd<=NOFILE; fd++){
-    if ((f=myproc()->ofile[fd])!= NULL){
+    if ((f=myproc()->ofile[fd])!= 0){
         f->readbytes=0;
         f->writebytes=0;
     }
