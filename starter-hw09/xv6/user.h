@@ -24,7 +24,7 @@ char* sbrk(int);
 int sleep(int);
 int uptime(void);
 int halt(void);
-int getiostats(int fd, struct iostats* stats);
+int getiostats(int , struct iostats*);
 
 
 // ulib.c
